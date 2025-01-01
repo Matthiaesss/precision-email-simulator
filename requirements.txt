@@ -1,5 +1,6 @@
 beautifulsoup4==4.12.3
 chardet==5.2.0
+numpy==1.26.4
 pandas==1.4.2
 paramiko==3.4.0
 pygame==2.5.2
