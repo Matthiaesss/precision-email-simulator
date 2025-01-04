@@ -1,23 +1,18 @@
-import os
-import sys
-
-import yaml
-from PySide2 import QtWidgets, QtCore
-from PySide2.QtUiTools import QUiLoader
-from PySide2.QtWidgets import QApplication, QStackedWidget, QFileDialog, QMessageBox
-from functools import partial
-from pynput import mouse,keyboard
-
-import TaskWindow
-
+import datetime
 import socket
 import threading
-import pandas as pd
-import sys
 import time
-import datetime
+from functools import partial
 from pathlib import Path
-import pickle
+
+import pandas as pd
+import yaml
+from PySide2 import QtWidgets
+from PySide2.QtUiTools import QUiLoader
+from PySide2.QtWidgets import QApplication, QFileDialog, QMessageBox
+from pynput import mouse, keyboard
+
+import TaskWindow
 
 
 class PrecisionEmailSimulator(QtWidgets.QWidget):

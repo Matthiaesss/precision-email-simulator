@@ -1,6 +1,4 @@
-import pandas as pd
 import yaml
-
 from PySide2 import QtWidgets
 from PySide2.QtUiTools import QUiLoader
 from PySide2.QtWidgets import QApplication, QFileDialog, QMessageBox

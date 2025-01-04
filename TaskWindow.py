@@ -5,20 +5,16 @@ import random
 import time
 import webbrowser
 from pathlib import Path
-import ast
 
 import pandas as pd
 from PySide2 import QtGui, QtCore, QtWidgets, QtWebChannel, QtWebEngineWidgets
 from PySide2.QtCore import QRectF, QSize, Qt
-from PySide2.QtGui import QIcon, QPixmap, QTextDocument
+from PySide2.QtGui import QTextDocument
 from PySide2.QtUiTools import QUiLoader
 from PySide2.QtWebEngineWidgets import QWebEngineView, QWebEnginePage
-from PySide2.QtWidgets import QMessageBox, QTableWidgetItem, QStyleOptionViewItem, QApplication, QStyle
+from PySide2.QtWidgets import QMessageBox, QTableWidgetItem, QStyleOptionViewItem, QStyle
 from pygame import mixer
 from win10toast import ToastNotifier
-import paramiko
-import io
-import requests
 
 now = datetime.datetime.now()
 # Path("./data").mkdir(parents=True, exist_ok=True)
