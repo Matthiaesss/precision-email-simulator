@@ -25,13 +25,13 @@ class PrecisionEmailSimulator(QtWidgets.QWidget):
         self.mouseAndKeyboard = True
 
         self.ui.startBtn.clicked.connect(self.start)
-        self.ui.loadConfigBtn.clicked.connect(self.loadConfig)
+        self.ui.loadConfigBtn.clicked.connect(self.load_config)
 
         self.ui.instructionText.setHidden(True)
         self.ui.pisText.setHidden(True)
         self.ui.sensorsWidget.hide()
 
-        self.ui.imotionConnectBtn.clicked.connect(partial(self.startImotionConnection, self.ui.imotionLabel))
+        self.ui.imotionConnectBtn.clicked.connect(partial(self.start_imotion_connection, self.ui.imotionLabel))
         self.folderPath = ''
         # eye tracker data is collected through iMotion
         self.eyeColumns = ['timestamp', 'timestamp_device', 'GazeLeftX', 'GazeLeftY', 'GazeRightX', 'GazeRightY',
@@ -55,21 +55,21 @@ class PrecisionEmailSimulator(QtWidgets.QWidget):
         #
         self.startRecording = False
 
-    def setConfig(self, config):
+    def set_config(self, config):
         self.study = config
-        self.updateUI()
+        self.update_ui()
 
-    def loadConfig(self):
+    def load_config(self):
         options = QFileDialog.Options()
         options |= QFileDialog.DontUseNativeDialog
-        fileName, _ = QFileDialog.getOpenFileName(self, "QFileDialog.getOpenFileName()", "",
+        file_name, _ = QFileDialog.getOpenFileName(self, "QFileDialog.getOpenFileName()", "",
                                                   "*.yaml", options=options)
-        if fileName:
-            with open(fileName) as f:
+        if file_name:
+            with open(file_name) as f:
                 self.study = yaml.load(f, Loader=yaml.SafeLoader)
-                self.updateUI()
+                self.update_ui()
 
-    def updateUI(self):
+    def update_ui(self):
 
         if self.study.get('welcomeText') != '':
             self.ui.welcomeText.setText(self.study.get('welcomeText'))
@@ -81,8 +81,8 @@ class PrecisionEmailSimulator(QtWidgets.QWidget):
         self.startRecording = True
         self.setup_folder()
         if self.mouseAndKeyboard:
-            self.mouseActivity()
-            self.keyboardActivity()
+            self.mouse_activity()
+            self.keyboard_activity()
 
         study = TaskWindow.TaskWindow(self.ui.usernameBox.text(), self.study)
 
@@ -95,7 +95,7 @@ class PrecisionEmailSimulator(QtWidgets.QWidget):
         #
         # self.ui.hide()
         #
-        # self.login_ui.loginBtn.clicked.connect(self.verifyLogin)
+        # self.login_ui.loginBtn.clicked.connect(self.verify_login)
 
     def setup_folder(self):
         # create folder and csv files
@@ -109,7 +109,7 @@ class PrecisionEmailSimulator(QtWidgets.QWidget):
 
         if self.imotionConnection:
             self.eyeData.to_csv(self.folderPath + self.startTime.strftime("%d-%m-%Y_%H-%M-%S") + '_eye.csv', index=False)
-            # self.shimmerData.to_csv(self.folderPath + self.startTime.strftime("%d-%m-%Y_%H-%M-%S") + '_shimmer.csv',
+            # self.shimmerData.to_csv(self.folder_path + self.startTime.strftime("%d-%m-%Y_%H-%M-%S") + '_shimmer.csv',
             #                         index=False)
         if self.mouseAndKeyboard:
             self.mouseData.to_csv(self.folderPath + self.startTime.strftime("%d-%m-%Y_%H-%M-%S") + '_mouse.csv',
@@ -117,7 +117,7 @@ class PrecisionEmailSimulator(QtWidgets.QWidget):
             self.keyboardData.to_csv(self.folderPath + self.startTime.strftime("%d-%m-%Y_%H-%M-%S") + '_keyboard.csv',
                                      index=False)
 
-    def verifyLogin(self):
+    def verify_login(self):
 
         if self.login_ui.username.text() == 'uoavrclub@auckland.ac.nz' and self.login_ui.password.text() == 'VrClub123':
 
@@ -130,22 +130,22 @@ class PrecisionEmailSimulator(QtWidgets.QWidget):
             self.ui.close()
 
         else:
-            msgBox = QMessageBox()
-            msgBox.setIcon(QMessageBox.Information)
-            msgBox.setText(
+            msg_box = QMessageBox()
+            msg_box.setIcon(QMessageBox.Information)
+            msg_box.setText(
                 "The combination of credentials you have entered is incorrect. \nPlease check that you have entered a valid University username \nor an email previously registered with us and your correct \npassword.")
-            msgBox.setWindowTitle("Warning")
-            msgBox.setStandardButtons(QMessageBox.Ok)
-            msgBox.show()
-            returnValue = msgBox.exec()
+            msg_box.setWindowTitle("Warning")
+            msg_box.setStandardButtons(QMessageBox.Ok)
+            msg_box.show()
+            _ = msg_box.exec()
 
-    def startImotionConnection(self, label):
+    def start_imotion_connection(self, label):
         print(label)
-        backgroundThread = threading.Thread(target=self.imotionConnect, args=(label,))
-        backgroundThread.deamon = True
-        backgroundThread.start()
+        background_thread = threading.Thread(target=self.imotion_connect, args=(label,))
+        background_thread.deamon = True
+        background_thread.start()
 
-    def mouseActivity(self):
+    def mouse_activity(self):
 
         def on_click(x, y, button, pressed):
             # print('c')
@@ -179,7 +179,7 @@ class PrecisionEmailSimulator(QtWidgets.QWidget):
         listener = mouse.Listener(on_click=on_click, on_scroll=on_scroll)
         listener.start()
 
-    def keyboardActivity(self):
+    def keyboard_activity(self):
         def on_press(key):
             if self.startRecording:
                 try:
@@ -200,7 +200,7 @@ class PrecisionEmailSimulator(QtWidgets.QWidget):
         listener = keyboard.Listener(on_press=on_press)
         listener.start()
 
-    def imotionConnect(self, label):
+    def imotion_connect(self, label):
         # Create a TCP/IP socket
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
@@ -221,7 +221,7 @@ class PrecisionEmailSimulator(QtWidgets.QWidget):
             self.folderPath = './data/no_user_name/' + self.startTime.strftime("%d-%m-%Y_%H-%M-%S") + '/'
 
         self.eyeData.to_csv(self.folderPath + self.startTime.strftime("%d-%m-%Y_%H-%M-%S") + '_eye.csv', index=False)
-        # self.shimmerData.to_csv(self.folderPath + self.startTime.strftime("%d-%m-%Y_%H-%M-%S") + '_shimmer.csv',
+        # self.shimmerData.to_csv(self.folder_path + self.startTime.strftime("%d-%m-%Y_%H-%M-%S") + '_shimmer.csv',
         #                         index=False)
         self.mouseData.to_csv(self.folderPath + self.startTime.strftime("%d-%m-%Y_%H-%M-%S") + '_mouse.csv',
                               index=False)
@@ -230,18 +230,18 @@ class PrecisionEmailSimulator(QtWidgets.QWidget):
 
         try:
             while self.imotionConnection:
-                incomingDataStr = sock.recv(1024)
+                incoming_data_str = sock.recv(1024)
 
-                d = incomingDataStr.decode().split("\r\n")
+                d = incoming_data_str.decode().split("\r\n")
                 for dataStr in d:
                     data = dataStr.split(";")
                     if self.startRecording:
                         if len(data) == 18:  # eye tracker data
-                            rowDF = pd.DataFrame(
+                            row_df = pd.DataFrame(
                                 [[time.time() * 1000, data[3], data[6], data[7], data[8], data[9], data[10],
                                   data[11], data[12], data[13], data[14], data[15], data[16], data[17]]],
                                 columns=self.eyeColumns)
-                            self.eyeData = pd.concat([self.eyeData, rowDF]).reset_index(drop=True)
+                            self.eyeData = pd.concat([self.eyeData, row_df]).reset_index(drop=True)
                             if self.eyeData.shape[0] > 1000:
                                 self.eyeData.to_csv(
                                     self.folderPath + self.startTime.strftime("%d-%m-%Y_%H-%M-%S") + '_eye.csv',
@@ -250,24 +250,24 @@ class PrecisionEmailSimulator(QtWidgets.QWidget):
                                 self.eyeData = self.eyeData.iloc[0:0]
 
                         # elif len(data) == 19:  # shimmer data
-                        #     rowDF = pd.DataFrame(
+                        #     row_df = pd.DataFrame(
                         #         [[time.time() * 1000, data[3], data[7], data[8], data[9], data[10], data[11],
                         #           data[12], data[13], data[14], data[15]]],
                         #         columns=self.shimmerColumns)
-                        #     self.shimmerData = pd.concat([self.shimmerData, rowDF]).reset_index(drop=True)
+                        #     self.shimmerData = pd.concat([self.shimmerData, row_df]).reset_index(drop=True)
                         #     if self.shimmerData.shape[0] > 1000:
                         #         self.shimmerData.to_csv(
-                        #             self.folderPath + self.startTime.strftime("%d-%m-%Y_%H-%M-%S") + '_shimmer.csv',
+                        #             self.folder_path + self.startTime.strftime("%d-%m-%Y_%H-%M-%S") + '_shimmer.csv',
                         #             mode='a', header=False,
                         #             index=False)
                         #         self.shimmerData = self.shimmerData.iloc[0:0]
 
                         elif len(data) == 10:  # mouse data
-                            rowDF = pd.DataFrame(
+                            row_df = pd.DataFrame(
 
                                 [[time.time() * 1000, data[3], data[5], data[6], data[7], data[8]]],
                                 columns=self.mouseColumns)
-                            self.mouseData = pd.concat([self.mouseData, rowDF]).reset_index(drop=True)
+                            self.mouseData = pd.concat([self.mouseData, row_df]).reset_index(drop=True)
                             if self.mouseData.shape[0] > 5:
                                 self.mouseData.to_csv(
                                     self.folderPath + self.startTime.strftime("%d-%m-%Y_%H-%M-%S") + '_mouse.csv',
@@ -277,10 +277,10 @@ class PrecisionEmailSimulator(QtWidgets.QWidget):
                             print("mouse data")
                             print(data)
                         elif len(data) == 6:  # keyboard data
-                            rowDF = pd.DataFrame(
+                            row_df = pd.DataFrame(
                                 [[time.time() * 1000, data[3], data[5]]],
                                 columns=self.keyboardColumns)
-                            self.keyboardData = pd.concat([self.keyboardData, rowDF]).reset_index(drop=True)
+                            self.keyboardData = pd.concat([self.keyboardData, row_df]).reset_index(drop=True)
                             if self.keyboardData.shape[0] > 5:
                                 self.keyboardData.to_csv(
                                     self.folderPath + self.startTime.strftime("%d-%m-%Y_%H-%M-%S") + '_keyboard.csv',

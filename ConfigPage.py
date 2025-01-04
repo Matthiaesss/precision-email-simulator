@@ -24,202 +24,205 @@ class ConfigPage(QtWidgets.QWidget):
         self.ui.sessionSelectDB.addItem(self.currentSession)
 
         # =================== file loading section =================================
-        self.ui.BrowseBtn_E.clicked.connect(lambda: self.browseFile(self.ui.emailPath, self.study, 'emailListLocation'))
+        self.ui.BrowseBtn_E.clicked.connect(lambda: self.browse_file(self.ui.emailPath, self.study, 'emailListLocation'))
         self.ui.BrowseBtn_R.clicked.connect(
-            lambda: self.browseFolder(self.ui.resourcePath, self.study, 'emailResourceLocation'))
-        self.ui.BrowseBtn_S.clicked.connect(lambda: self.browseFolder(self.ui.savePath, self.study, 'saveLocation'))
+            lambda: self.browse_folder(self.ui.resourcePath, self.study, 'emailResourceLocation'))
+        self.ui.BrowseBtn_S.clicked.connect(lambda: self.browse_folder(self.ui.savePath, self.study, 'saveLocation'))
 
         # test for text change
         self.ui.emailPath.editingFinished.connect(
-            lambda: self.updateTextField(self.ui.emailPath, self.study, 'emailListLocation'))
+            lambda: self.update_text_field(self.ui.emailPath, self.study, 'emailListLocation'))
         self.ui.resourcePath.editingFinished.connect(
-            lambda: self.updateTextField(self.ui.resourcePath, self.study, 'emailResourceLocation'))
+            lambda: self.update_text_field(self.ui.resourcePath, self.study, 'emailResourceLocation'))
         self.ui.savePath.editingFinished.connect(
-            lambda: self.updateTextField(self.ui.savePath, self.study, 'saveLocation'))
+            lambda: self.update_text_field(self.ui.savePath, self.study, 'saveLocation'))
 
 
         # twice because one for update after click on button
         # self.ui.htmlPath.editingFinished.connect(
-        #     lambda: self.updateTextField(self.ui.htmlPath, self.study, 'emailHtmlLocation'))
+        #     lambda: self.update_text_field(self.ui.htmlPath, self.study, 'emailHtmlLocation'))
         # self.ui.attachmentPath.editingFinished.connect(
-        #     lambda: self.updateTextField(self.ui.attachmentPath, self.study, 'attachmentsLocation'))
+        #     lambda: self.update_text_field(self.ui.attachmentPath, self.study, 'attachmentsLocation'))
         # self.ui.pisPath.editingFinished.connect(
-        #     lambda: self.updateTextField(self.ui.pisPath, self.study, 'PISLocation'))
+        #     lambda: self.update_text_field(self.ui.pisPath, self.study, 'PISLocation'))
         # self.ui.instructionPath.editingFinished.connect(
-        #     lambda: self.updateTextField(self.ui.instructionPath, self.study, 'instructionLocation'))
+        #     lambda: self.update_text_field(self.ui.instructionPath, self.study, 'instructionLocation'))
         # self.ui.savePath.editingFinished.connect(
-        #     lambda: self.updateTextField(self.ui.savePath, self.study, 'saveLocation'))
+        #     lambda: self.update_text_field(self.ui.savePath, self.study, 'saveLocation'))
         # update if user choose to type manually
 
         # ========================== session tab ===================================
 
-        self.ui.addSessionBtn.clicked.connect(self.addNewSession)
-        self.ui.sessionSelectDB.currentTextChanged.connect(self.sessionSelectionDBUpdate)
+        self.ui.addSessionBtn.clicked.connect(self.add_new_session)
+        self.ui.sessionSelectDB.currentTextChanged.connect(self.session_selection_db_update)
 
         self.ui.sessionName.editingFinished.connect(
-            lambda: self.updateSessionName(self.ui.sessionName, self.getCurrentSession(), 'name'))
+            lambda: self.update_session_name(self.ui.sessionName, self.get_current_session(), 'name'))
 
         self.ui.sessionDuration.editingFinished.connect(
-            lambda: self.updateTextField(self.ui.sessionDuration, self.getCurrentSession(), 'duration'))
+            lambda: self.update_text_field(self.ui.sessionDuration, self.get_current_session(), 'duration'))
         self.ui.audioNotifications.editingFinished.connect(
-            lambda: self.updateTextField(self.ui.audioNotifications, self.getCurrentSession(), 'audioNotification'))
+            lambda: self.update_text_field(self.ui.audioNotifications, self.get_current_session(), 'audioNotification'))
         self.ui.incomingInterval.editingFinished.connect(
-            lambda: self.updateTextField(self.ui.incomingInterval, self.getCurrentSession(), 'incomingInterval'))
+            lambda: self.update_text_field(self.ui.incomingInterval, self.get_current_session(), 'incomingInterval'))
         self.ui.taskPath.editingFinished.connect(
-            lambda: self.updateTextField(self.ui.taskPath, self.getCurrentSession(), 'primaryTaskHtml'))
+            lambda: self.update_text_field(self.ui.taskPath, self.get_current_session(), 'primaryTaskHtml'))
         self.ui.endSessionPopup.editingFinished.connect(
-            lambda: self.updateTextField(self.ui.endSessionPopup, self.getCurrentSession(), 'endSessionPopup'))
+            lambda: self.update_text_field(self.ui.endSessionPopup, self.get_current_session(), 'endSessionPopup'))
 
-        self.ui.incomingCB.clicked.connect(self.updateCheckBoxRelatedFields)
+        self.ui.incomingCB.clicked.connect(self.update_check_box_related_fields)
         self.ui.incomingCB.clicked.connect(
-            lambda: self.updateCheckBox(self.ui.incomingCB, self.getCurrentSession(), 'incomingEmails'))
-        self.ui.phishEmailCB.clicked.connect(self.updateCheckBoxRelatedFields)
+            lambda: self.update_check_box(self.ui.incomingCB, self.get_current_session(), 'incomingEmails'))
+        self.ui.phishEmailCB.clicked.connect(self.update_check_box_related_fields)
         self.ui.phishEmailCB.clicked.connect(
-            lambda: self.updateCheckBox(self.ui.phishEmailCB, self.getCurrentSession(), 'hasPhishEmails'))
+            lambda: self.update_check_box(self.ui.phishEmailCB, self.get_current_session(), 'hasPhishEmails'))
         self.ui.timeCountDownCB.clicked.connect(
-            lambda: self.updateCheckBox(self.ui.timeCountDownCB, self.getCurrentSession(), 'timeCountDown'))
+            lambda: self.update_check_box(self.ui.timeCountDownCB, self.get_current_session(), 'timeCountDown'))
 
         self.ui.starBtn.clicked.connect(
-            lambda: self.updateCheckBox(self.ui.starBtn, self.getCurrentSession(), 'starBtn'))
+            lambda: self.update_check_box(self.ui.starBtn, self.get_current_session(), 'starBtn'))
         self.ui.reportBtn.clicked.connect(
-            lambda: self.updateCheckBox(self.ui.reportBtn, self.getCurrentSession(), 'reportBtn'))
+            lambda: self.update_check_box(self.ui.reportBtn, self.get_current_session(), 'reportBtn'))
         self.ui.deleteBtn.clicked.connect(
-            lambda: self.updateCheckBox(self.ui.deleteBtn, self.getCurrentSession(), 'deleteBtn'))
+            lambda: self.update_check_box(self.ui.deleteBtn, self.get_current_session(), 'deleteBtn'))
         self.ui.unreadBtn.clicked.connect(
-            lambda: self.updateCheckBox(self.ui.unreadBtn, self.getCurrentSession(), 'unreadBtn'))
+            lambda: self.update_check_box(self.ui.unreadBtn, self.get_current_session(), 'unreadBtn'))
 
         self.ui.BrowseBtn_T.clicked.connect(
-            lambda: self.browseFile(self.ui.taskPath, self.getCurrentSession(), 'primaryTaskHtml'))
+            lambda: self.browse_file(self.ui.taskPath, self.get_current_session(), 'primaryTaskHtml'))
 
         # ========================= legit emails tab =================================
 
         self.ui.listStart_L.editingFinished.connect(
-            lambda: self.updateTextField(self.ui.listStart_L, self.getCurrentLegit().get('emailListRange'), 'start'))
+            lambda: self.update_text_field(self.ui.listStart_L, self.get_current_legit().get('emailListRange'), 'start'))
         self.ui.listEnd_L.editingFinished.connect(
-            lambda: self.updateTextField(self.ui.listEnd_L, self.getCurrentLegit().get('emailListRange'), 'finish'))
+            lambda: self.update_text_field(self.ui.listEnd_L, self.get_current_legit().get('emailListRange'), 'finish'))
         self.ui.incomingStart_L.editingFinished.connect(
-            lambda: self.updateTextField(self.ui.incomingStart_L, self.getCurrentLegit().get('incomingRange'), 'start'))
+            lambda: self.update_text_field(self.ui.incomingStart_L, self.get_current_legit().get('incomingRange'), 'start'))
         self.ui.incomingEnd_L.editingFinished.connect(
-            lambda: self.updateTextField(self.ui.incomingEnd_L, self.getCurrentLegit().get('incomingRange'), 'finish'))
+            lambda: self.update_text_field(self.ui.incomingEnd_L, self.get_current_legit().get('incomingRange'), 'finish'))
 
         self.ui.shuffleCB_L.clicked.connect(
-            lambda: self.updateCheckBox(self.ui.shuffleCB_L, self.getCurrentLegit(), 'shuffleEmails'))
+            lambda: self.update_check_box(self.ui.shuffleCB_L, self.get_current_legit(), 'shuffleEmails'))
 
         # ========================= phish emails tab =================================
 
         self.ui.emailNum_P.editingFinished.connect(
-            lambda: self.updateTextField(self.ui.emailNum_P, self.getCurrentPhish(), 'emailListNum'))
+            lambda: self.update_text_field(self.ui.emailNum_P, self.get_current_phish(), 'emailListNum'))
         self.ui.emailList_P.editingFinished.connect(
-            lambda: self.updateTextField(self.ui.emailList_P, self.getCurrentPhish(), 'emailList'))
+            lambda: self.update_text_field(self.ui.emailList_P, self.get_current_phish(), 'emailList'))
         self.ui.emailLoc_P.editingFinished.connect(
-            lambda: self.updateTextField(self.ui.emailLoc_P, self.getCurrentPhish(), 'emailListLocations'))
+            lambda: self.update_text_field(self.ui.emailLoc_P, self.get_current_phish(), 'emailListLocations'))
         self.ui.incomingNum_P.editingFinished.connect(
-            lambda: self.updateTextField(self.ui.incomingNum_P, self.getCurrentPhish(), 'incomingNum'))
+            lambda: self.update_text_field(self.ui.incomingNum_P, self.get_current_phish(), 'incomingNum'))
         self.ui.incoming_P.editingFinished.connect(
-            lambda: self.updateTextField(self.ui.incoming_P, self.getCurrentPhish(), 'incomingList'))
+            lambda: self.update_text_field(self.ui.incoming_P, self.get_current_phish(), 'incomingList'))
         self.ui.incomingLoc_P.editingFinished.connect(
-            lambda: self.updateTextField(self.ui.incomingLoc_P, self.getCurrentPhish(), 'incomingLocations'))
+            lambda: self.update_text_field(self.ui.incomingLoc_P, self.get_current_phish(), 'incomingLocations'))
 
-        self.ui.shuffleCB_P.clicked.connect(self.updateCheckBoxRelatedFields)
+        self.ui.shuffleCB_P.clicked.connect(self.update_check_box_related_fields)
         self.ui.shuffleCB_P.clicked.connect(
-            lambda: self.updateCheckBox(self.ui.shuffleCB_P, self.getCurrentPhish(), 'shuffleEmails'))
+            lambda: self.update_check_box(self.ui.shuffleCB_P, self.get_current_phish(), 'shuffleEmails'))
 
-        self.ui.RandomLocCB.clicked.connect(self.updateCheckBoxRelatedFields)
+        self.ui.RandomLocCB.clicked.connect(self.update_check_box_related_fields)
         self.ui.RandomLocCB.clicked.connect(
-            lambda: self.updateCheckBox(self.ui.RandomLocCB, self.getCurrentPhish(), 'randomLoc'))
+            lambda: self.update_check_box(self.ui.RandomLocCB, self.get_current_phish(), 'randomLoc'))
 
         # ========================= Question marks =================================
 
-        self.ui.audioNotificationQ.clicked.connect(lambda: messageNotification('Information',
+        self.ui.audioNotificationQ.clicked.connect(lambda: message_notification('Information',
                                                                                'List of notification time to finish.\nFormat: integer separated by comma. \ne.g. 1, 5 means will have notification when there is 1 mins and 5 mins left.'))
 
-        self.ui.invervalQ.clicked.connect(lambda: messageNotification('Information',
+        self.ui.invervalQ.clicked.connect(lambda: message_notification('Information',
                                                                       'The time between two incoming emails.\nThe interval is consistant between all incoming emails\ne.g. interval of 2 minutes means the first incoming email will come 2 minutes into the session, then the second would come at 4 mins in, until all incoming emails have been sent. \nNote: 1) make sure the incoming emails are sent before the session ends, 2) both legit and phish incoming emails are included, 3) minumum input = 0.1, i.e. 6 seconds between two incoming emails .'))
 
-        self.ui.emailRangeQ.clicked.connect(lambda: messageNotification('Information',
+        self.ui.emailRangeQ.clicked.connect(lambda: message_notification('Information',
                                                                         'Enter the first and last email\'s id.\nThe email id should be interger.'))
 
-        self.ui.emailListQ.clicked.connect(lambda: messageNotification('Information',
+        self.ui.emailListQ.clicked.connect(lambda: message_notification('Information',
                                                                        'Enter the list of phish emails.\nFormat: integer (phish email id) separated by comma. \ne.g. 1, 2 means selecting phish email with id 1 and 2.'))
 
-        self.ui.pLocQ.clicked.connect(lambda: messageNotification('Information',
+        self.ui.pLocQ.clicked.connect(lambda: message_notification('Information',
                                                                   'Enter the corresponding location of phish emails in the list.\nFormat: integer separated by comma. \ne.g.'
                                                                   ' 1, 3 means the phish emails will be inserted at the 1st and 3rd position from top down. \nNote: please make'
                                                                   ' sure the number is less or equal to the number of phishing emails.e.g. phishing emails: 1,2,3,4; location 2,4,6,'
                                                                   ' means will display the first three phishing emails in the corresponding location, and skip the last one (because '
                                                                   'location is not given)'))
 
-        self.ui.shufflePQ.clicked.connect(lambda: messageNotification('Information',
+        self.ui.shufflePQ.clicked.connect(lambda: message_notification('Information',
                                                                       'randomise the order of phishing emails, need to specify the number of phishing emails added to the '
                                                                       'inbox.\ne.g. out of the n phishing emails specified in "phishing emails", randomly select x of them '
                                                                       'and add into the inbox. When location of the phishing emails are specified, the number should be consistant.'
                                                                       '\nNote: shuffling emails would apply to both phishing emails in the inbox, and incoming phishing emails.'))
 
 
-        self.ui.saveConfigBtn.clicked.connect(self.saveConfig)
-        self.ui.openConfigBtn.clicked.connect(self.loadConfig)
-        # self.ui.previewBtn.clicked.connect(self.getCurrentSession)
+        self.ui.saveConfigBtn.clicked.connect(self.save_config)
+        self.ui.openConfigBtn.clicked.connect(self.load_config)
+        # self.ui.previewBtn.clicked.connect(self.get_current_session)
 
-        self.ui.previewBtn.clicked.connect(self.previewStudy)
+        self.ui.previewBtn.clicked.connect(self.preview_study)
 
-        self.addNewSession()
+        self.add_new_session()
 
     # *********************************** Functions *********************************************
 
     # ======== load files and update fields ===================
 
-    def browseFile(self, textField, target, field):
+    def browse_file(self, text_field, target, field):
         fname = QFileDialog.getOpenFileName(self, 'open file', './')
-        textField.setText(fname[0])
-        self.updateTextField(textField, target, field)
+        text_field.setText(fname[0])
+        self.update_text_field(text_field, target, field)
 
-    def browseFolder(self, textField, target, field):
+    def browse_folder(self, text_field, target, field):
         file = str(QFileDialog.getExistingDirectory(self, "Select Directory"))
-        textField.setText(file)
-        self.updateTextField(textField, target, field)
+        text_field.setText(file)
+        self.update_text_field(text_field, target, field)
 
-    def updateTextField(self, trigger, target, field):
+    @staticmethod
+    def update_text_field(trigger, target, field):
         target.update({field: trigger.text()})
 
-    def updateTextEditField(self, trigger, target, field):
+    @staticmethod
+    def update_text_edit_field(trigger, target, field):
         target.update({field: trigger.toPlainText()})
 
-    def updateSessionName(self, trigger, target, field):
+    def update_session_name(self, trigger, target, field):
         index = self.ui.sessionSelectDB.currentIndex()
-        self.updateTextField(trigger, target, field)
+        self.update_text_field(trigger, target, field)
         self.ui.sessionSelectDB.setItemText(index, trigger.text())
 
-    def updateCheckBox(self, trigger, target, field):
+    @staticmethod
+    def update_check_box(trigger, target, field):
         target.update({field: trigger.isChecked()})
 
-    def previewStudy(self):
-        emailApp = PrecisionEmailSimulator()
-        emailApp.setConfig(self.study)
-        emailApp.ui.show()
+    def preview_study(self):
+        email_app = PrecisionEmailSimulator()
+        email_app.set_config(self.study)
+        email_app.ui.show()
 
     # ========== getter ===============
-    def getCurrentSession(self):
+    def get_current_session(self):
         return self.study.get('sessions').get(self.currentSession)
 
-    def getCurrentLegit(self):
-        return self.getCurrentSession().get('legitEmails')
+    def get_current_legit(self):
+        return self.get_current_session().get('legitEmails')
 
-    def getCurrentPhish(self):
-        return self.getCurrentSession().get('phishEmails')
+    def get_current_phish(self):
+        return self.get_current_session().get('phishEmails')
 
     # ======== session tab ===========
-    def sessionSelectionDBUpdate(self):
+    def session_selection_db_update(self):
         if self.ui.sessionSelectDB.currentText() != '':
             for session in self.study.get('sessions'):
                 if self.study.get('sessions').get(session).get('name') == self.ui.sessionSelectDB.currentText():
                     self.currentSession = session
 
-            self.updateSessionTabUI()
-            self.updateLegitTabUI()
-            self.updatePhishTabUI()
-            self.updateCheckBoxRelatedFields()
+            self.update_session_tab_ui()
+            self.update_legit_tab_ui()
+            self.update_phish_tab_ui()
+            self.update_check_box_related_fields()
 
-    def addNewSession(self):
+    def add_new_session(self):
         print('clicked')
         sessions = self.study.get('sessions')
         print(len(sessions))
@@ -245,14 +248,14 @@ class ConfigPage(QtWidgets.QWidget):
         }
         self.currentSession = session_name
 
-        self.addNewLegit()
-        self.addNewPhish()
+        self.add_new_legit()
+        self.add_new_phish()
 
         self.ui.sessionSelectDB.addItem(self.currentSession)
         self.ui.sessionSelectDB.setCurrentText(self.currentSession)
         # self.updateTable()
 
-    def updateCheckBoxRelatedFields(self):
+    def update_check_box_related_fields(self):
 
         if self.ui.phishEmailCB.isChecked():
             self.ui.phishEmailWidget.show()
@@ -286,23 +289,23 @@ class ConfigPage(QtWidgets.QWidget):
             self.ui.pIncomingLocBox.show()
 
     # ========================================================================
-    def addNewLegit(self):
+    def add_new_legit(self):
 
-        self.getCurrentSession()['legitEmails'] = {
+        self.get_current_session()['legitEmails'] = {
             'emailListRange': {'start': '', 'finish': ''},
             'shuffleEmails': False,
             'incomingRange': {'start': '', 'finish': ''},
         }
 
-        print(self.getCurrentSession())
+        print(self.get_current_session())
 
-        self.updateCheckBoxRelatedFields()
+        self.update_check_box_related_fields()
 
         # update the dictionary
 
-    def addNewPhish(self):
+    def add_new_phish(self):
 
-        self.getCurrentSession()['phishEmails'] = {
+        self.get_current_session()['phishEmails'] = {
             'emailList': '',
             'randomLoc': False,
             'emailListLocations': '',
@@ -314,142 +317,142 @@ class ConfigPage(QtWidgets.QWidget):
             'incomingNum': '',
 
         }
-        self.updateCheckBoxRelatedFields()
+        self.update_check_box_related_fields()
 
     # ================================================================
 
-    def checkDataType(self):
-        integerField = [self.ui.sessionDuration, self.ui.listStart_L, self.ui.listEnd_L,
+    def check_data_type(self):
+        integer_field = [self.ui.sessionDuration, self.ui.listStart_L, self.ui.listEnd_L,
                         self.ui.incomingStart_L, self.ui.incomingEnd_L, self.ui.emailNum_P, self.ui.incomingNum_P]
-        integerListField = [self.ui.audioNotifications, self.ui.emailList_P, self.ui.emailLoc_P, self.ui.incoming_P,
+        integer_list_field = [self.ui.audioNotifications, self.ui.emailList_P, self.ui.emailLoc_P, self.ui.incoming_P,
                             self.ui.incomingLoc_P]
-        floatField = [self.ui.incomingInterval]
+        float_field = [self.ui.incomingInterval]
 
-        for element in integerField:
+        for element in integer_field:
             if (not element.text().isdigit()) and (element.text() != ''):
-                messageNotification('Error', 'input field ' + element.objectName() + ' should be integers only')
+                message_notification('Error', 'input field ' + element.objectName() + ' should be integers only')
                 return False
 
-        for element in floatField:
+        for element in float_field:
             if element.text() != '':
                 try:
                     float(element.text())
 
                 except ValueError:
-                    messageNotification('Error', 'input field ' + element.objectName() + ' should be a number')
+                    message_notification('Error', 'input field ' + element.objectName() + ' should be a number')
                     return False
 
             # if (not isinstance(element, (int,float))) and (element.text() != ''):
             #     print(element)
             #     print(ty)
-            #     messageNotification('Error', 'input field ' + element.objectName() + ' should be a number')
+            #     message_notification('Error', 'input field ' + element.objectName() + ' should be a number')
             #     return False
 
-        for element in integerListField:
+        for element in integer_list_field:
             if not element.text() == '':
-                list = element.text().split(',')
+                ls = element.text().split(',')
                 print(element.objectName())
-                print(list)
-                for item in list:
+                print(ls)
+                for item in ls:
                     if not item.strip().isdigit():
-                        messageNotification('Error',
+                        message_notification('Error',
                                             'input field ' + element.objectName() + ' should be integers separated by comma')
                         return False
 
         if self.ui.sessionDuration.text() != '':
             for audioNotificationTime in self.ui.sessionDuration.text().split(','):
                 if int(audioNotificationTime) > int(self.ui.sessionDuration.text()):
-                    messageNotification('Error', 'All audio notification times most be less than the sesison duration')
+                    message_notification('Error', 'All audio notification times most be less than the sesison duration')
 
                     return False
 
         return True
 
-    def saveConfig(self):
+    def save_config(self):
         print(self.study)
-        if self.checkDataType():
+        if self.check_data_type():
 
             options = QFileDialog.Options()
             options |= QFileDialog.DontUseNativeDialog
-            fileName, _ = QFileDialog.getSaveFileName(self, "Save config file", "./",
+            file_name, _ = QFileDialog.getSaveFileName(self, "Save config file", "./",
                                                       "All Files (*);;", options=options)
-            if fileName:
-                if fileName[-5:] != '.yaml':
-                    fileName = fileName + '.yaml'
+            if file_name:
+                if file_name[-5:] != '.yaml':
+                    file_name = file_name + '.yaml'
 
-                with open(fileName, 'w') as file:
+                with open(file_name, 'w') as file:
                     yaml.dump(self.study, file, sort_keys=False)
 
-    def loadConfig(self):
+    def load_config(self):
         options = QFileDialog.Options()
         options |= QFileDialog.DontUseNativeDialog
-        fileName, _ = QFileDialog.getOpenFileName(self, "QFileDialog.getOpenFileName()", "",
+        file_name, _ = QFileDialog.getOpenFileName(self, "QFileDialog.getOpenFileName()", "",
                                                   "All Files (*);;Python Files (*.py)", options=options)
-        if fileName:
-            with open(fileName) as f:
+        if file_name:
+            with open(file_name) as f:
                 self.study = yaml.load(f, Loader=yaml.SafeLoader)
 
             self.currentSession = list(self.study.get('sessions').keys())[0]
             print('get current session')
             print(self.currentSession)
 
-            self.updateLoadFileSection()
-            self.updateSessionSelectDBText()
+            self.update_load_file_section()
+            self.update_session_select_db_text()
             self.ui.sessionSelectDB.setCurrentText(self.study.get('sessions').get(self.currentSession).get('name'))
-            self.updateCheckBoxRelatedFields()
+            self.update_check_box_related_fields()
             # self.updateSessionTabUi()
 
-    def updateLoadFileSection(self):
+    def update_load_file_section(self):
 
         self.ui.emailPath.setText(self.study.get('emailListLocation'))
         self.ui.resourcePath.setText(self.study.get('emailResourceLocation'))
         self.ui.savePath.setText(self.study.get('saveLocation'))
 
-    def updateSessionSelectDBText(self):
+    def update_session_select_db_text(self):
         self.ui.sessionSelectDB.clear()
         for session in self.study.get('sessions'):
             self.ui.sessionSelectDB.addItem(self.study.get('sessions').get(session).get('name'))
         self.ui.sessionSelectDB.setCurrentText(self.currentSession)
 
-    def updateSessionTabUI(self):
-        self.ui.sessionName.setText(self.getCurrentSession().get('name'))
-        self.ui.sessionDuration.setText(self.getCurrentSession().get('duration'))
-        self.ui.audioNotifications.setText(self.getCurrentSession().get('audioNotification'))
-        self.ui.incomingInterval.setText(self.getCurrentSession().get('incomingInterval'))
-        self.ui.endSessionPopup.setText(self.getCurrentSession().get('endSessionPopup'))
-        self.ui.taskPath.setText(self.getCurrentSession().get('primaryTaskHtml'))
+    def update_session_tab_ui(self):
+        self.ui.sessionName.setText(self.get_current_session().get('name'))
+        self.ui.sessionDuration.setText(self.get_current_session().get('duration'))
+        self.ui.audioNotifications.setText(self.get_current_session().get('audioNotification'))
+        self.ui.incomingInterval.setText(self.get_current_session().get('incomingInterval'))
+        self.ui.endSessionPopup.setText(self.get_current_session().get('endSessionPopup'))
+        self.ui.taskPath.setText(self.get_current_session().get('primaryTaskHtml'))
 
-        self.ui.phishEmailCB.setChecked(self.getCurrentSession().get('hasPhishEmails'))
-        self.ui.incomingCB.setChecked(self.getCurrentSession().get('incomingEmails'))
-        self.ui.timeCountDownCB.setChecked(self.getCurrentSession().get('timeCountDown'))
+        self.ui.phishEmailCB.setChecked(self.get_current_session().get('hasPhishEmails'))
+        self.ui.incomingCB.setChecked(self.get_current_session().get('incomingEmails'))
+        self.ui.timeCountDownCB.setChecked(self.get_current_session().get('timeCountDown'))
 
-    def updateLegitTabUI(self):
+    def update_legit_tab_ui(self):
 
-        self.ui.listStart_L.setText(self.getCurrentLegit().get('emailListRange').get('start'))
-        self.ui.listEnd_L.setText(self.getCurrentLegit().get('emailListRange').get('finish'))
-        self.ui.incomingStart_L.setText(self.getCurrentLegit().get('incomingRange').get('start'))
-        self.ui.incomingEnd_L.setText(self.getCurrentLegit().get('incomingRange').get('finish'))
+        self.ui.listStart_L.setText(self.get_current_legit().get('emailListRange').get('start'))
+        self.ui.listEnd_L.setText(self.get_current_legit().get('emailListRange').get('finish'))
+        self.ui.incomingStart_L.setText(self.get_current_legit().get('incomingRange').get('start'))
+        self.ui.incomingEnd_L.setText(self.get_current_legit().get('incomingRange').get('finish'))
 
-        self.ui.shuffleCB_L.setChecked(self.getCurrentLegit().get('shuffleEmails'))
+        self.ui.shuffleCB_L.setChecked(self.get_current_legit().get('shuffleEmails'))
 
-    def updatePhishTabUI(self):
+    def update_phish_tab_ui(self):
 
-        self.ui.emailNum_P.setText(self.getCurrentPhish().get('emailListNum'))
-        self.ui.emailList_P.setText(self.getCurrentPhish().get('emailList'))
-        self.ui.emailLoc_P.setText(self.getCurrentPhish().get('emailListLocations'))
-        self.ui.incomingNum_P.setText(self.getCurrentPhish().get('incomingNum'))
-        self.ui.incoming_P.setText(self.getCurrentPhish().get('incomingList'))
-        self.ui.incomingLoc_P.setText(self.getCurrentPhish().get('incomingLocations'))
+        self.ui.emailNum_P.setText(self.get_current_phish().get('emailListNum'))
+        self.ui.emailList_P.setText(self.get_current_phish().get('emailList'))
+        self.ui.emailLoc_P.setText(self.get_current_phish().get('emailListLocations'))
+        self.ui.incomingNum_P.setText(self.get_current_phish().get('incomingNum'))
+        self.ui.incoming_P.setText(self.get_current_phish().get('incomingList'))
+        self.ui.incomingLoc_P.setText(self.get_current_phish().get('incomingLocations'))
 
-        self.ui.shuffleCB_P.setChecked(self.getCurrentPhish().get('shuffleEmails'))
-        self.ui.RandomLocCB.setChecked(self.getCurrentPhish().get('randomLoc'))
+        self.ui.shuffleCB_P.setChecked(self.get_current_phish().get('shuffleEmails'))
+        self.ui.RandomLocCB.setChecked(self.get_current_phish().get('randomLoc'))
 
 
-def checkNumsBetween(num1, num2, data):
+def check_nums_between(num1, num2, data):
     return data.loc[(data['ID'] >= num1) & (data['ID'] <= num2)].shape[0]
 
 
-def deleteItemsOfLayout(layout):
+def delete_items_of_layout(layout):
     if layout is not None:
         while layout.count():
             item = layout.takeAt(0)
@@ -457,17 +460,17 @@ def deleteItemsOfLayout(layout):
             if widget is not None:
                 widget.setParent(None)
             else:
-                deleteItemsOfLayout(item.layout())
+                delete_items_of_layout(item.layout())
 
 
-def messageNotification(messageType, text):
-    msgBox = QMessageBox()
-    msgBox.setIcon(QMessageBox.Information)
-    msgBox.setText(text)
-    msgBox.setWindowTitle(messageType)
-    msgBox.setStandardButtons(QMessageBox.Ok)
-    returnValue = msgBox.exec()
-    if returnValue == QMessageBox.Ok:
+def message_notification(message_type, text):
+    msg_box = QMessageBox()
+    msg_box.setIcon(QMessageBox.Information)
+    msg_box.setText(text)
+    msg_box.setWindowTitle(message_type)
+    msg_box.setStandardButtons(QMessageBox.Ok)
+    return_value = msg_box.exec()
+    if return_value == QMessageBox.Ok:
         print('OK clicked')
 
 
