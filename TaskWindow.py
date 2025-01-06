@@ -788,7 +788,7 @@ class TaskWindow(QtWidgets.QWidget):
     def create_attachment_btn(self, name):
         btn = QtWidgets.QPushButton(name)
         icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap(os.path.abspath(os.getcwd()) + r'\resources\attachment.png'))
+        icon.addPixmap(QtGui.QPixmap(os.path.abspath(os.getcwd()) + r'/resources/attachment.png'))
         btn.setIcon(icon)
         btn.setStyleSheet(
             "border: 1px solid rgb(150, 150, 150); border-radius:2px; background:#56d5f9; margin: 10px; font-size: 18px; padding: 5px;")
@@ -804,7 +804,7 @@ class TaskWindow(QtWidgets.QWidget):
     def create_phish_attachment_btn(self, name):
         btn = QtWidgets.QPushButton(name)
         icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap(os.path.abspath(os.getcwd()) + r'\resources\attachment.png'))
+        icon.addPixmap(QtGui.QPixmap(os.path.abspath(os.getcwd()) + r'/resources/attachment.png'))
         btn.setIcon(icon)
         btn.setStyleSheet(
             "border: 1px solid rgb(150, 150, 150); border-radius:2px; background:#56d5f9; margin: 10px; font-size: 18px; padding: 5px;")
