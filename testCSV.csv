@@ -16,7 +16,7 @@ ID,name,from,to,title,content,attachment,star,time,readState,category,LinkOfInte
 115,Test user 15,test@test.com,me,Email title 15,Test_Email.html,None,FALSE,18-Sep,FALSE,InRel,0
 116,Test user 16,test@test.com,me,Email title 16,Test_Email.html,None,FALSE,18-Sep,FALSE,ExNone,5
 1,Phish1,phish@phishing.com,me,Phish Title 1,Test_Email.html,None,FALSE,19-Sep,FALSE,phish,1
-2,Phish2,phish@phishing.com,me,Phish Title 2,Test_Email.html,None,FALSE,20-Sep,FALSE,phish,2
+2,Phish2,phish@phishing.com,me,Phish Title 2,Test_Email.html,P_test.pdf,FALSE,20-Sep,FALSE,phish,2
 3,Phish3,phish@phishing.com,me,Phish Title 3,Test_Email.html,None,FALSE,21-Sep,FALSE,phish,3
 4,Phish4,phish@phishing.com,me,Phish Title 4,Test_Email.html,None,FALSE,22-Sep,FALSE,phish,4
 5,Phish5,phish@phishing.com,me,Phish Title 5,Test_Email.html,None,FALSE,23-Sep,FALSE,phish,5
