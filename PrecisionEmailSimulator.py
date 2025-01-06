@@ -1,5 +1,6 @@
 import datetime
 import socket
+import sys
 import threading
 import time
 from functools import partial
@@ -299,7 +300,7 @@ class PrecisionEmailSimulator(QtWidgets.QWidget):
 
 
 if __name__ == '__main__':
-    app = QApplication([])
+    app = QApplication(sys.argv + ["--no-sandbox"])
     mainWindow = PrecisionEmailSimulator()
     mainWindow.ui.show()
     app.exec_()
