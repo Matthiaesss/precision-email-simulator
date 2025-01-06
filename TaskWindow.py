@@ -392,7 +392,8 @@ class TaskWindow(QtWidgets.QWidget):
 
         self.primary_task.page().setWebChannel(self.channel)
 
-        self.primary_task.setUrl(QtCore.QUrl.fromLocalFile(self.get_current_session().get('primaryTaskHtml')))
+        path = f"{os.getcwd()}/{self.get_current_session().get('primaryTaskHtml')}"
+        self.primary_task.setUrl(QtCore.QUrl.fromLocalFile(path))
 
         self.ui.primaryTaskL.addWidget(self.primary_task)
 
@@ -675,10 +676,15 @@ class TaskWindow(QtWidgets.QWidget):
         # set to address
         self.ui.toAddress.setText('to ' + item['to'])
 
+        if self.get_current_session().get('cssStyles'):
+            self.setup_email_css(item['category'])
+        else:
+            self.reset_css()
+
         # set the content
         clear_layout(self.ui.contentL)
         web_engine_view = HtmlView(self)
-        path = self.config.get('emailResourceLocation') + '/html/' + item['content']
+        path = f"{os.getcwd()}/{self.config.get('emailResourceLocation')}/html/{item['content']}"
         print(path)
         # htmlFile = requests.get(path)
         # print(htmlFile.content)
@@ -790,7 +796,7 @@ class TaskWindow(QtWidgets.QWidget):
         return btn
 
     def open_attachment(self, name):
-        attachment_root = self.config.get('emailResourceLocation') + '/Attachments'
+        attachment_root = f"{os.getcwd()}/{self.config.get('emailResourceLocation')}/Attachments"
         webbrowser.open(attachment_root + '/' + name)
         self.log_email("open attachment", "legit attachment: " + name)
 
