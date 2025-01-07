@@ -1,7 +1,7 @@
 import yaml
-from PySide2 import QtWidgets
-from PySide2.QtUiTools import QUiLoader
-from PySide2.QtWidgets import QApplication, QFileDialog, QMessageBox
+from PySide6 import QtWidgets
+from PySide6.QtUiTools import QUiLoader
+from PySide6.QtWidgets import QApplication, QFileDialog, QMessageBox
 
 from pms_main import PrecisionEmailSimulator
 
@@ -477,4 +477,4 @@ if __name__ == '__main__':
     app = QApplication([])
     main_window = ConfigPage()
     main_window.ui.show()
-    app.exec_()
+    app.exec()
