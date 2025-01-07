@@ -6,6 +6,7 @@ import time
 import webbrowser
 from pathlib import Path
 
+import pandas
 import pandas as pd
 from PySide2 import QtGui, QtCore, QtWidgets, QtWebChannel, QtWebEngineWidgets
 from PySide2.QtCore import QRectF, QSize, Qt
@@ -86,8 +87,8 @@ class TaskWindow(QtWidgets.QWidget):
         # self.phishEmailPool = self.phishEmailData.loc[~self.phishEmailData['ID'].isin(notSuffledEmails)]
         # self.phishEmailPool = self.phishEmailPool.sample(frac=1).reset_index(drop=True)
 
-        self.current_emaillist = []
-        self.incomingEmails = []
+        self.current_emaillist = pd.DataFrame()
+        self.incomingEmails = pd.DataFrame()
         self.incomingInterval = 0
         self.previousEmails = []
         self.currentEmail = None
@@ -182,7 +183,7 @@ class TaskWindow(QtWidgets.QWidget):
         self.incomingEmailTimer.timeout.connect(self.incoming_timer)
         print('cccc')
         print(session_config.get('incomingInterval'))
-        self.incomingEmailTimer.start(1000 * 60 * float(session_config.get('incomingInterval')))
+        self.incomingEmailTimer.start(int(1000 * 60 * float(session_config.get('incomingInterval'))))
 
     def incoming_timer(self):
         if self.incomingEmails.shape[0] > 0:
@@ -379,6 +380,7 @@ class TaskWindow(QtWidgets.QWidget):
         else:
             self.ui.close()
 
+    # noinspection PyUnresolvedReferences
     def setup_primary_task(self):
         # read html file
         clear_layout(self.ui.primaryTaskL)
@@ -405,6 +407,7 @@ class TaskWindow(QtWidgets.QWidget):
         """
         )
 
+    # noinspection PyCallingNonCallable
     @QtCore.Slot(str)
     def get_task_data(self, value):
         print('....................')
@@ -422,7 +425,7 @@ class TaskWindow(QtWidgets.QWidget):
 
             data.loc[len(data)] = row
 
-        data.to_csv(path, index=False, header=False)
+        data.to_csv(str(path), index=False, header=False)
 
     # ========================= logging ==========================================
 
@@ -754,7 +757,7 @@ class TaskWindow(QtWidgets.QWidget):
             self.change_row_background(self.ui.emailList.currentRow(), QtGui.QColor(245, 250, 255))
 
     def set_unread_email_count(self):
-        self.ui.unreadEmailCount.setText(str((self.current_emaillist['readState'] == False).sum()))
+        self.ui.unreadEmailCount.setText(str(len(self.current_emaillist) - (self.current_emaillist['readState'].convert_dtypes(convert_boolean=True)).sum()))
 
     def setup_email_css(self, category):
         self.ui.emailSubjectLine.setStyleSheet(self.get_current_session().get('cssStyles').get(category).get('header'))
@@ -877,7 +880,7 @@ def insert_row_(row_number, df, row_value):
     # Concat the two dataframes
     df_result = pd.concat([df1, df2])
     # Reassign the index labels
-    df_result.index = [*range(df_result.shape[0])]
+    df_result.index = pandas.Index(data=[*range(df_result.shape[0])])
     # Return the updated dataframe
     return df_result
 
@@ -885,7 +888,7 @@ def insert_row_(row_number, df, row_value):
 class EmailContentPage(QWebEnginePage):
     def acceptNavigationRequest(self, url, _type, is_main_frame):
         if _type == QWebEnginePage.NavigationTypeLinkClicked:
-            QtGui.QDesktopServices.openUrl(url);
+            QtGui.QDesktopServices.openUrl(url)
             log = pd.read_csv(log_file_name)
             row = log.iloc[-1]
             with open(log_file_name, 'a', newline='') as file:
@@ -910,10 +913,11 @@ class PrimaryTaskData(QtCore.QObject):
         super().__init__(parent)
         self._value = ""
 
-    @QtCore.Property(str)
+    @property
     def value(self):
         return self._value
 
+    # noinspection PyUnresolvedReferences
     @value.setter
     def value(self, v):
         self._value = v
@@ -929,7 +933,7 @@ class ListDelegate(QtWidgets.QStyledItemDelegate):
         doc = QTextDocument()
         doc.setHtml(opt.text)
         doc.setDefaultFont(opt.font)
-        opt.text = "";
+        opt.text = ""
         style = opt.widget.style()
         style.drawControl(QStyle.CE_ItemViewItem, opt, painter)
         painter.translate(opt.rect.left(), opt.rect.top())
@@ -941,6 +945,6 @@ class ListDelegate(QtWidgets.QStyledItemDelegate):
         opt = QStyleOptionViewItem(option)
         self.initStyleOption(opt, index)
         doc = QTextDocument()
-        doc.setHtml(opt.text);
+        doc.setHtml(opt.text)
         doc.setTextWidth(opt.rect.width())
-        return QSize(doc.idealWidth(), doc.size().height())
+        return QSize(doc.idealWidth(), int(doc.size().height()))
