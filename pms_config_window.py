@@ -3,7 +3,7 @@ from PySide2 import QtWidgets
 from PySide2.QtUiTools import QUiLoader
 from PySide2.QtWidgets import QApplication, QFileDialog, QMessageBox
 
-from PrecisionEmailSimulator import PrecisionEmailSimulator
+from pms_main import PrecisionEmailSimulator
 
 
 class ConfigPage(QtWidgets.QWidget):

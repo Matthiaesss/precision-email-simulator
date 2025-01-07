@@ -13,7 +13,7 @@ from PySide2.QtUiTools import QUiLoader
 from PySide2.QtWidgets import QApplication, QFileDialog, QMessageBox
 from pynput import mouse, keyboard
 
-import TaskWindow
+import pms_task_window
 
 
 class PrecisionEmailSimulator(QtWidgets.QWidget):
@@ -86,7 +86,7 @@ class PrecisionEmailSimulator(QtWidgets.QWidget):
             self.mouse_activity()
             self.keyboard_activity()
 
-        study = TaskWindow.TaskWindow(self.ui.usernameBox.text(), self.config)
+        study = pms_task_window.TaskWindow(self.ui.usernameBox.text(), self.config)
 
         study.ui.show()
         study.activateWindow()
@@ -125,7 +125,7 @@ class PrecisionEmailSimulator(QtWidgets.QWidget):
 
         if self.login_ui.username.text() == 'uoavrclub@auckland.ac.nz' and self.login_ui.password.text() == 'VrClub123':
 
-            study = TaskWindow.TaskWindow(self.ui.usernameBox.text(), self.config)
+            study = pms_task_window.TaskWindow(self.ui.usernameBox.text(), self.config)
             self.startRecording = True
 
             study.ui.show()
