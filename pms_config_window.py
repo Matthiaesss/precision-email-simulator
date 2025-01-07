@@ -20,8 +20,8 @@ class ConfigPage(QtWidgets.QWidget):
             'sessions': {},
 
         })
-        self.currentSession = 'session1'
-        self.ui.sessionSelectDB.addItem(self.currentSession)
+        self.current_session = 'session1'
+        self.ui.sessionSelectDB.addItem(self.current_session)
 
         # =================== file loading section =================================
         self.ui.BrowseBtn_E.clicked.connect(lambda: self.browse_file(self.ui.emailPath, self.study, 'emailListLocation'))
@@ -169,8 +169,8 @@ class ConfigPage(QtWidgets.QWidget):
     # ======== load files and update fields ===================
 
     def browse_file(self, text_field, target, field):
-        fname = QFileDialog.getOpenFileName(self, 'open file', './')
-        text_field.setText(fname[0])
+        file_name = QFileDialog.getOpenFileName(self, 'open file', './')
+        text_field.setText(file_name[0])
         self.update_text_field(text_field, target, field)
 
     def browse_folder(self, text_field, target, field):
@@ -202,7 +202,7 @@ class ConfigPage(QtWidgets.QWidget):
 
     # ========== getter ===============
     def get_current_session(self):
-        return self.study.get('sessions').get(self.currentSession)
+        return self.study.get('sessions').get(self.current_session)
 
     def get_current_legit(self):
         return self.get_current_session().get('legitEmails')
@@ -215,7 +215,7 @@ class ConfigPage(QtWidgets.QWidget):
         if self.ui.sessionSelectDB.currentText() != '':
             for session in self.study.get('sessions'):
                 if self.study.get('sessions').get(session).get('name') == self.ui.sessionSelectDB.currentText():
-                    self.currentSession = session
+                    self.current_session = session
 
             self.update_session_tab_ui()
             self.update_legit_tab_ui()
@@ -246,14 +246,13 @@ class ConfigPage(QtWidgets.QWidget):
             'phishEmails': {},
 
         }
-        self.currentSession = session_name
+        self.current_session = session_name
 
         self.add_new_legit()
         self.add_new_phish()
 
-        self.ui.sessionSelectDB.addItem(self.currentSession)
-        self.ui.sessionSelectDB.setCurrentText(self.currentSession)
-        # self.updateTable()
+        self.ui.sessionSelectDB.addItem(self.current_session)
+        self.ui.sessionSelectDB.setCurrentText(self.current_session)
 
     def update_check_box_related_fields(self):
 
@@ -360,8 +359,8 @@ class ConfigPage(QtWidgets.QWidget):
                         return False
 
         if self.ui.sessionDuration.text() != '':
-            for audioNotificationTime in self.ui.sessionDuration.text().split(','):
-                if int(audioNotificationTime) > int(self.ui.sessionDuration.text()):
+            for audio_notification_time in self.ui.sessionDuration.text().split(','):
+                if int(audio_notification_time) > int(self.ui.sessionDuration.text()):
                     message_notification('Error', 'All audio notification times most be less than the sesison duration')
 
                     return False
@@ -392,13 +391,13 @@ class ConfigPage(QtWidgets.QWidget):
             with open(file_name) as f:
                 self.study = yaml.load(f, Loader=yaml.SafeLoader)
 
-            self.currentSession = list(self.study.get('sessions').keys())[0]
+            self.current_session = list(self.study.get('sessions').keys())[0]
             print('get current session')
-            print(self.currentSession)
+            print(self.current_session)
 
             self.update_load_file_section()
             self.update_session_select_db_text()
-            self.ui.sessionSelectDB.setCurrentText(self.study.get('sessions').get(self.currentSession).get('name'))
+            self.ui.sessionSelectDB.setCurrentText(self.study.get('sessions').get(self.current_session).get('name'))
             self.update_check_box_related_fields()
             # self.updateSessionTabUi()
 
@@ -412,7 +411,7 @@ class ConfigPage(QtWidgets.QWidget):
         self.ui.sessionSelectDB.clear()
         for session in self.study.get('sessions'):
             self.ui.sessionSelectDB.addItem(self.study.get('sessions').get(session).get('name'))
-        self.ui.sessionSelectDB.setCurrentText(self.currentSession)
+        self.ui.sessionSelectDB.setCurrentText(self.current_session)
 
     def update_session_tab_ui(self):
         self.ui.sessionName.setText(self.get_current_session().get('name'))
@@ -476,6 +475,6 @@ def message_notification(message_type, text):
 
 if __name__ == '__main__':
     app = QApplication([])
-    mainWindow = ConfigPage()
-    mainWindow.ui.show()
+    main_window = ConfigPage()
+    main_window.ui.show()
     app.exec_()

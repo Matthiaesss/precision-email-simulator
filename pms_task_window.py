@@ -36,8 +36,6 @@ For the local version
 If running the generated exe file, must add the UI_file folder in the room folder
 '''
 
-myhost = '130.216.217.42'
-
 
 # myusername = 'wang'
 # mypassword = '123456'
@@ -61,42 +59,25 @@ class TaskWindow(QtWidgets.QWidget):
 
         self.username = user_name
         self.config = config
-        print(config)
-        self.saveLocation = self.config.get('saveLocation')
+        self.save_location = self.config.get('saveLocation')
 
         self.ui = QUiLoader().load('resources/UI_files/main_page.ui')
 
         if self.username == '':
             self.username = 'no_user_name'
         self.emails = pd.read_csv(self.config.get('emailListLocation'))
-        # self.legitEmailData.columns = column_names
         self.emails['star'] = self.emails['star'].astype('bool')
-        #
-        # self.phishEmailData = pd.read_csv(self.config.get('phishEmailLocation'))
-        # # self.phishEmailData.columns = column_names
-        # self.phishEmailData['star'] = self.phishEmailData['star'].astype('bool')
-        #
-        # notSuffledEmails = []
-        # for session in self.config.get('sessions'):
-        #     session = self.config.get('sessions').get(session)
-        #
-        #     if not session.get('phishEmails').get('shuffleEmails'):
-        #         pemails = session.get('phishEmails').get('emailList').split(',')
-        #         pemails = [int(x) for x in pemails]
-        #         notSuffledEmails = notSuffledEmails + pemails
-        # self.phishEmailPool = self.phishEmailData.loc[~self.phishEmailData['ID'].isin(notSuffledEmails)]
-        # self.phishEmailPool = self.phishEmailPool.sample(frac=1).reset_index(drop=True)
 
-        self.current_emaillist = pd.DataFrame()
-        self.incomingEmails = pd.DataFrame()
-        self.incomingInterval = 0
-        self.previousEmails = []
-        self.currentEmail = None
+        self.current_emails = pd.DataFrame()
+        self.incoming_emails = pd.DataFrame()
+        self.incoming_interval = 0
+        self.previous_emails = []
+        self.current_email = None
         self.hovered_url = 'none'
-        self.audioNotificationTimes = []
-        self.sessionTimer = QtCore.QTimer(self)
-        self.incomingEmailTimer = QtCore.QTimer(self)
-        self.reported_emaillist = []
+        self.audio_notification_times = []
+        self.session_timer = QtCore.QTimer(self)
+        self.incoming_email_timer = QtCore.QTimer(self)
+        self.reported_emails = []
         # ========== set up interface elements ===========
         mixer.init()
         self.beep = mixer.Sound("./resources/beep.wav")
@@ -118,8 +99,8 @@ class TaskWindow(QtWidgets.QWidget):
         # ==============================
         self.create_log_file()
 
-        self.sessionList = list(self.config.get('sessions').keys())
-        self.currentSession = self.sessionList[0]
+        self.session_list = list(self.config.get('sessions').keys())
+        self.current_session = self.session_list[0]
 
         self.setup_session()
 
@@ -127,14 +108,14 @@ class TaskWindow(QtWidgets.QWidget):
 
     # ======== set up session ===================
     def get_current_session(self):
-        return self.config.get('sessions').get(self.currentSession)
+        return self.config.get('sessions').get(self.current_session)
 
     def setup_session_timer(self, session_config):
-        self.sessionTimer = QtCore.QTimer(self)
+        self.session_timer = QtCore.QTimer(self)
         self.count_down_counter = int(session_config.get('duration')) * 60
         self.running = True
-        self.sessionTimer.timeout.connect(self.timer_count_down)
-        self.sessionTimer.start(1000)
+        self.session_timer.timeout.connect(self.timer_count_down)
+        self.session_timer.start(1000)
 
     def timer_count_down(self):
         if self.running:
@@ -145,7 +126,7 @@ class TaskWindow(QtWidgets.QWidget):
                 print("completed")
                 self.log_email("finish " + self.get_current_session().get('name'))
                 self.save_primary_task_data_local()
-                print(self.currentSession)
+                print(self.current_session)
 
                 if self.get_current_session().get('endSessionPopup') != '':
                     message_notification(self,
@@ -154,7 +135,7 @@ class TaskWindow(QtWidgets.QWidget):
                 # check if it is the last session
 
             # add some notification for countdown
-            elif (self.count_down_counter / 60) in self.audioNotificationTimes:
+            elif (self.count_down_counter / 60) in self.audio_notification_times:
                 self.beep.play()
 
             if self.count_down_counter % 60 < 10:
@@ -166,9 +147,9 @@ class TaskWindow(QtWidgets.QWidget):
 
     def next_btn_click(self):
         print('next button clicked')
-        print(self.currentSession)
-        if self.incomingEmailTimer.isActive():  # turn off the incoming email timer
-            self.incomingEmailTimer.stop()
+        print(self.current_session)
+        if self.incoming_email_timer.isActive():  # turn off the incoming email timer
+            self.incoming_email_timer.stop()
         self.count_down_counter = 1
         # if self.get_current_session().get('primaryTaskHtml') != '':
         #     print('xxxxxxxxxxxxxxxxxxxxxx')
@@ -178,22 +159,22 @@ class TaskWindow(QtWidgets.QWidget):
         print('setting up incoming timer')
 
         # set up timers for in coming emails
-        self.incomingEmailTimer = QtCore.QTimer()
+        self.incoming_email_timer = QtCore.QTimer()
 
-        self.incomingEmailTimer.timeout.connect(self.incoming_timer)
+        self.incoming_email_timer.timeout.connect(self.incoming_timer)
         print('cccc')
         print(session_config.get('incomingInterval'))
-        self.incomingEmailTimer.start(int(1000 * 60 * float(session_config.get('incomingInterval'))))
+        self.incoming_email_timer.start(int(1000 * 60 * float(session_config.get('incomingInterval'))))
 
     def incoming_timer(self):
-        if self.incomingEmails.shape[0] > 0:
+        if self.incoming_emails.shape[0] > 0:
             print('addEmail')
-            self.incomingEmails = self.add_email(self.incomingEmails)
+            self.incoming_emails = self.add_email(self.incoming_emails)
             self.set_unread_email_count()
 
-            if self.incomingEmails.shape[0] == 0:
+            if self.incoming_emails.shape[0] == 0:
                 print("timer stoped")
-                self.incomingEmailTimer.stop()
+                self.incoming_email_timer.stop()
 
     def setup_session(self):
         session_config = self.get_current_session()
@@ -202,7 +183,7 @@ class TaskWindow(QtWidgets.QWidget):
         self.ui.URLDisplay.setHidden(True)
 
         if session_config.get('audioNotification') != '':
-            self.audioNotificationTimes = [int(x) for x in session_config.get('audioNotification').split(',')]
+            self.audio_notification_times = [int(x) for x in session_config.get('audioNotification').split(',')]
 
         if session_config.get('timeCountDown'):
             self.ui.timerLabel.setHidden(False)
@@ -226,7 +207,7 @@ class TaskWindow(QtWidgets.QWidget):
         self.set_up_email_timestamp()
 
         self.set_up_email_list_table()
-        self.log_email("start " + self.currentSession)
+        self.log_email("start " + self.current_session)
         if session_config.get('primaryTaskHtml') != '':
             self.ui.primaryTaskW.show()
             self.setup_primary_task()
@@ -234,28 +215,28 @@ class TaskWindow(QtWidgets.QWidget):
             self.ui.primaryTaskW.hide()
 
     def setup_emails(self, session_config):
-        self.current_emaillist = self.emails[
+        self.current_emails = self.emails[
             (self.emails['ID'] >= int(session_config.get('legitEmails').get('emailListRange').get('start'))) &
             (self.emails['ID'] <= int(session_config.get('legitEmails').get('emailListRange').get('finish')))]
         if session_config.get('legitEmails').get('shuffleEmails'):
-            self.current_emaillist = self.current_emaillist.sample(frac=1).reset_index(drop=True)
+            self.current_emails = self.current_emails.sample(frac=1).reset_index(drop=True)
 
         if session_config.get('incomingEmails'):
-            self.incomingEmails = self.emails[
+            self.incoming_emails = self.emails[
                 (self.emails['ID'] >= int(session_config.get('legitEmails').get('incomingRange').get('start'))) &
                 (self.emails['ID'] <= int(session_config.get('legitEmails').get('incomingRange').get('finish')))]
             if session_config.get('legitEmails').get('shuffleEmails'):
-                self.incomingEmails = self.incomingEmails.sample(frac=1).reset_index(drop=True)
+                self.incoming_emails = self.incoming_emails.sample(frac=1).reset_index(drop=True)
 
         if session_config.get('hasPhishEmails'):
             self.add_phishing_emails_to_list(session_config)
 
-        self.current_emaillist = self.current_emaillist.sort_index().reset_index(drop=True)
-        print(self.incomingEmails)
+        self.current_emails = self.current_emails.sort_index().reset_index(drop=True)
+        print(self.incoming_emails)
         print('bbbbb')
-        print(len(self.incomingEmails))
-        if len(self.incomingEmails) != 0:
-            self.incomingEmails = self.incomingEmails.sort_index().reset_index(drop=True)
+        print(len(self.incoming_emails))
+        if len(self.incoming_emails) != 0:
+            self.incoming_emails = self.incoming_emails.sort_index().reset_index(drop=True)
 
     def add_phishing_emails_to_list(self, session_config):
         p_email_inbox_id = [int(x) for x in session_config.get('phishEmails').get('emailList').split(',')]
@@ -274,9 +255,9 @@ class TaskWindow(QtWidgets.QWidget):
             p_email_incoming = p_email_incoming.iloc[:int(session_config.get('phishEmails').get('incomingNum'))]
 
 
-        self.current_emaillist = self.insert_p_email_to_list(p_email_inbox, self.current_emaillist, 'emailListLocations', session_config)
+        self.current_emails = self.insert_p_email_to_list(p_email_inbox, self.current_emails, 'emailListLocations', session_config)
         if session_config.get('incomingEmails'):
-            self.incomingEmails = self.insert_p_email_to_list(p_email_incoming, self.incomingEmails, 'incomingLocations', session_config)
+            self.incoming_emails = self.insert_p_email_to_list(p_email_incoming, self.incoming_emails, 'incomingLocations', session_config)
 
     @staticmethod
     def insert_p_email_to_list(plist, elist, location, session_config):
@@ -299,23 +280,23 @@ class TaskWindow(QtWidgets.QWidget):
 
     # =======================  email set up ===============================================
 
-    def add_email(self, emaillist):
+    def add_email(self, email_list):
         print('----------------- email add notification --------------------------')
-        if emaillist.shape[0] > 0:
-            item = emaillist.iloc[0]
-            self.current_emaillist = self.current_emaillist.append(item, ignore_index=True)
+        if email_list.shape[0] > 0:
+            item = email_list.iloc[0]
+            self.current_emails = self.current_emails.append(item, ignore_index=True)
             self.load_email_widget(item, True)
-            emaillist = emaillist.iloc[1:, :]
+            email_list = email_list.iloc[1:, :]
             ToastNotifier().show_toast('An email has arrived', item['title'], icon_path='resources/icon.ico',
                                        duration=5,
                                        threaded=True)
-        return emaillist
+        return email_list
 
     # load emails, input is the row of email
     def load_email_widget(self, email, insert_at_front=False):
         if insert_at_front:
             current_time = datetime.datetime.now().strftime("%H:%M")
-            self.current_emaillist.loc[self.current_emaillist.ID == email['ID'], 'time'] = current_time
+            self.current_emails.loc[self.current_emails.ID == email['ID'], 'time'] = current_time
             email['time'] = current_time
             self.log_incoming_email(email)
             self.set_unread_email_count()
@@ -332,15 +313,15 @@ class TaskWindow(QtWidgets.QWidget):
         self.change_row_background(row_pos, QtGui.QColor(245, 250, 255))
 
     def set_up_email_timestamp(self):
-        lst = [random.randint(1, 10) for _ in range(self.current_emaillist.shape[0] - 4)]
+        random_numbers = [random.randint(1, 10) for _ in range(self.current_emails.shape[0] - 4)]
 
         # list sorted down from 10 to 1
-        lst.sort(reverse=True)
+        random_numbers.sort(reverse=True)
         current_day = datetime.date.today()
         time_list = []
 
         # set up the list of times for the emails (from oldest to newest)
-        for i in lst:
+        for i in random_numbers:
             time_list.append((current_day - datetime.timedelta(days=i)).strftime("%d %b"))
 
         time_list.append((datetime.datetime.now() - datetime.timedelta(hours=4, minutes=29)).strftime("%H:%M"))
@@ -348,11 +329,11 @@ class TaskWindow(QtWidgets.QWidget):
         time_list.append((datetime.datetime.now() - datetime.timedelta(hours=2, minutes=22)).strftime("%H:%M"))
         time_list.append((datetime.datetime.now() - datetime.timedelta(hours=0, minutes=17)).strftime("%H:%M"))
 
-        for index, row in self.current_emaillist.iterrows():
+        for index, row in self.current_emails.iterrows():
             if time_list:
-                self.current_emaillist.at[index, 'time'] = time_list.pop()
+                self.current_emails.at[index, 'time'] = time_list.pop()
             else:
-                self.current_emaillist.at[index, 'time'] = "-1"
+                self.current_emails.at[index, 'time'] = "-1"
             # del time_list[-1] #
 
     def change_row_background(self, row, colour):
@@ -364,18 +345,18 @@ class TaskWindow(QtWidgets.QWidget):
         email = self.ui.emailList.item(current_row, 0).text()
         subject_line = email.split('<br>')[1]
 
-        return self.current_emaillist.loc[self.current_emaillist['title'] == subject_line].iloc[0]
+        return self.current_emails.loc[self.current_emails['title'] == subject_line].iloc[0]
 
     # ========================== sections ================================================
 
     def get_next_section(self):
-        current_session_loc = self.sessionList.index(self.currentSession)
+        current_session_loc = self.session_list.index(self.current_session)
         print(current_session_loc)
-        print(len(self.sessionList))
-        if len(self.sessionList) > current_session_loc + 1:
-            next_session = self.sessionList[current_session_loc + 1]
+        print(len(self.session_list))
+        if len(self.session_list) > current_session_loc + 1:
+            next_session = self.session_list[current_session_loc + 1]
             print(next_session)
-            self.currentSession = next_session
+            self.current_session = next_session
             self.setup_session()
         else:
             self.ui.close()
@@ -412,7 +393,7 @@ class TaskWindow(QtWidgets.QWidget):
     def get_task_data(self, value):
         print('....................')
         print(value)
-        file_name = self.currentSession + '_task.csv'
+        file_name = self.current_session + '_task.csv'
         path = os.path.join(self.folder_path, file_name)
         data = pd.DataFrame(columns=['category', 'c1', 'c2', 'c3', 'c4', 'c5', 'c6'])
         vlist = value.split('\n')
@@ -431,7 +412,7 @@ class TaskWindow(QtWidgets.QWidget):
 
     def create_log_file(self):
         print('create log file')
-        self.folder_path = os.path.join(self.saveLocation, self.username)
+        self.folder_path = os.path.join(self.save_location, self.username)
         Path(self.folder_path).mkdir(parents=True, exist_ok=True)
         # self.folder_path = './data/' + self.username + '/'
         self.file_name = os.path.join(self.folder_path, now.strftime("%d-%m-%Y_%H-%M-%S") + '_log.csv')
@@ -477,12 +458,12 @@ class TaskWindow(QtWidgets.QWidget):
 
         header.setSectionResizeMode(0, QtWidgets.QHeaderView.Stretch)
 
-        for i in range(0, self.current_emaillist.shape[0]):
-            self.load_email_widget(self.current_emaillist.iloc[i])
+        for i in range(0, self.current_emails.shape[0]):
+            self.load_email_widget(self.current_emails.iloc[i])
 
         self.ui.emailList.selectRow(0)
 
-        self.currentEmail = self.get_current_email()
+        self.current_email = self.get_current_email()
         self.display_email()
 
     def email_table_clicked(self):
@@ -573,19 +554,19 @@ class TaskWindow(QtWidgets.QWidget):
 
     def star_btn_clicked(self):
         current = self.get_current_email()
-        index = self.current_emaillist.index[self.current_emaillist['ID'] == current['ID']].tolist()[0]
+        index = self.current_emails.index[self.current_emails['ID'] == current['ID']].tolist()[0]
 
         # check star state and toggle it
         if self.get_current_email()['star']:
-            self.current_emaillist.at[index, 'star'] = False
+            self.current_emails.at[index, 'star'] = False
             self.log_email("email unstared")
 
         else:
-            self.current_emaillist.at[index, 'star'] = True
+            self.current_emails.at[index, 'star'] = True
             self.log_email("email stared")
 
         self.set_email_row_font_colour(self.get_current_email())
-        self.update_star(self.current_emaillist.at[index, 'star'])
+        self.update_star(self.current_emails.at[index, 'star'])
 
     def update_star(self, value):
         if value:
@@ -604,33 +585,33 @@ class TaskWindow(QtWidgets.QWidget):
         # self.send_popup('The email has been reported', 3)
         self.log_email("email reported")
         _ = self.get_current_email()
-        # self.reported_emaillist = pd.concat([self.reported_emaillist, current_email.to_frame().T])
+        # self.reported_emails = pd.concat([self.reported_emails, current_email.to_frame().T])
 
         self.remove_current_selected_email()
         message_notification(self, "You have reported the selected email", False)
         # logging
 
     def remove_current_selected_email(self):
-        # print(self.current_emaillist)
+        # print(self.current_emails)
         current_email = self.get_current_email()
-        self.current_emaillist.drop(
-            self.current_emaillist.index[self.current_emaillist['ID'] == self.get_current_email()['ID']], inplace=True)
+        self.current_emails.drop(
+            self.current_emails.index[self.current_emails['ID'] == self.get_current_email()['ID']], inplace=True)
         print('--------------------------------')
-        print(self.previousEmails)
+        print(self.previous_emails)
 
-        if self.previousEmails[-1] == current_email.title:
-            self.previousEmails[:] = (x for x in self.previousEmails if x != self.previousEmails[-1])
+        if self.previous_emails[-1] == current_email.title:
+            self.previous_emails[:] = (x for x in self.previous_emails if x != self.previous_emails[-1])
         print()
-        if len(self.previousEmails) != 0:
-            previous_item = self.ui.emailList.findItems(self.previousEmails[-1], QtCore.Qt.MatchContains)
+        if len(self.previous_emails) != 0:
+            previous_item = self.ui.emailList.findItems(self.previous_emails[-1], QtCore.Qt.MatchContains)
             print(previous_item)
             if len(previous_item) == 1:  # if the previous email exist in the email table
                 print('previous exist')
                 self.ui.emailList.removeRow(self.ui.emailList.currentRow())
-                previous_row = self.ui.emailList.findItems(self.previousEmails[-1], QtCore.Qt.MatchContains)[0].row()
+                previous_row = self.ui.emailList.findItems(self.previous_emails[-1], QtCore.Qt.MatchContains)[0].row()
                 self.ui.emailList.selectRow(previous_row)
 
-                self.previousEmails[:] = (x for x in self.previousEmails if x != self.previousEmails[-1])
+                self.previous_emails[:] = (x for x in self.previous_emails if x != self.previous_emails[-1])
             else:
                 print('previous not exist')
                 self.ui.emailList.removeRow(self.ui.emailList.currentRow())
@@ -647,7 +628,7 @@ class TaskWindow(QtWidgets.QWidget):
     def unread_btn_click(self):
         # self.send_popup('The email is marked unread', 3)
         item = self.get_current_email()
-        self.current_emaillist.loc[self.current_emaillist['ID'] == item['ID'], 'readState'] = False
+        self.current_emails.loc[self.current_emails['ID'] == item['ID'], 'readState'] = False
         self.set_unread_email_count()
 
         self.set_row_font(self.ui.emailList.currentRow(), QtGui.QFont.Bold)
@@ -659,12 +640,12 @@ class TaskWindow(QtWidgets.QWidget):
     # =============================== display the email =============================================
 
     def display_email(self):
-        self.previousEmails = self.previousEmails + [self.currentEmail.title]
+        self.previous_emails = self.previous_emails + [self.current_email.title]
 
         item = self.get_current_email()
-        self.currentEmail = item
+        self.current_email = item
 
-        self.current_emaillist.loc[self.current_emaillist['ID'] == item['ID'], 'readState'] = True
+        self.current_emails.loc[self.current_emails['ID'] == item['ID'], 'readState'] = True
 
         self.set_unread_email_count()
 
@@ -689,13 +670,7 @@ class TaskWindow(QtWidgets.QWidget):
         web_engine_view = HtmlView(self)
         path = f"{os.getcwd()}/{self.config.get('emailResourceLocation')}/html/{item['content']}"
         print(path)
-        # htmlFile = requests.get(path)
-        # print(htmlFile.content)
-        # print(htmlFile.content.decode("utf-16"))
-        # web_engine_view.setHtml(htmlFile.content.decode("utf-16"))
         web_engine_view.load(QtCore.QUrl().fromLocalFile(path))
-        # web_engine_view.load(QtCore.QUrl('http://cs791-hishing-ticket-python-resource.s3-website-ap-southeast-2.amazonaws.com/ads.html'))
-        # web_engine_view.load(QtCore.QUrl(path))
         web_engine_view.resize(self.ui.contentW.width(), self.ui.contentW.height())
         self.ui.contentL.addWidget(web_engine_view)
         web_engine_view.page().linkHovered.connect(self.link_hovered)
@@ -757,7 +732,7 @@ class TaskWindow(QtWidgets.QWidget):
             self.change_row_background(self.ui.emailList.currentRow(), QtGui.QColor(245, 250, 255))
 
     def set_unread_email_count(self):
-        self.ui.unreadEmailCount.setText(str(len(self.current_emaillist) - (self.current_emaillist['readState'].convert_dtypes(convert_boolean=True)).sum()))
+        self.ui.unreadEmailCount.setText(str(len(self.current_emails) - (self.current_emails['readState'].convert_dtypes(convert_boolean=True)).sum()))
 
     def setup_email_css(self, category):
         self.ui.emailSubjectLine.setStyleSheet(self.get_current_session().get('cssStyles').get(category).get('header'))

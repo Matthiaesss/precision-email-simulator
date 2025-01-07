@@ -22,8 +22,8 @@ class PrecisionEmailSimulator(QtWidgets.QWidget):
         super(PrecisionEmailSimulator, self).__init__()
         self.ui = QUiLoader().load('resources/UI_files/welcome.ui')
         self.config = None
-        self.imotionConnection = True
-        self.mouseAndKeyboard = True
+        self.imotion_connection = True
+        self.mouse_and_keyboard = True
 
         self.ui.startBtn.clicked.connect(self.start)
         self.ui.loadConfigBtn.clicked.connect(self.load_config)
@@ -33,28 +33,29 @@ class PrecisionEmailSimulator(QtWidgets.QWidget):
         self.ui.sensorsWidget.hide()
 
         self.ui.imotionConnectBtn.clicked.connect(partial(self.start_imotion_connection, self.ui.imotionLabel))
-        self.folderPath = ''
+
+        self.user_results_dir = ''
         # eye tracker data is collected through iMotion
-        self.eyeColumns = ['timestamp', 'timestamp_device', 'GazeLeftX', 'GazeLeftY', 'GazeRightX', 'GazeRightY',
+        self.eye_columns = ['timestamp', 'timestamp_device', 'GazeLeftX', 'GazeLeftY', 'GazeRightX', 'GazeRightY',
                            'LeftPupilDiameter', 'RightPupilDiameter', 'LeftEyeDistance', 'RightEyeDistance',
                            'LeftEyePosX', 'LeftEyePosY', 'RightEyePosX', 'RightEyePosY']
-        self.eyeData = pd.DataFrame(columns=self.eyeColumns)
+        self.eye_data = pd.DataFrame(columns=self.eye_columns)
 
         # shimmer data is collected through iMotion
-        self.shimmerColumns = ['timestamp', 'timestamp_device', 'VSenseBatt RAW', 'VSenseBatt CAL',
+        self.shimmer_columns = ['timestamp', 'timestamp_device', 'VSenseBatt RAW', 'VSenseBatt CAL',
                                'Internal ADC A13 PPG RAW', 'Internal ADC A13 PPG CAL', 'GSR RAW', 'GSR Resistance CAL',
                                'GSR Conductance CAL', 'Heart Rate PPG ALG', 'IBI PPG ALG']
-        self.shimmerData = pd.DataFrame(columns=self.shimmerColumns)
+        self.shimmer_data = pd.DataFrame(columns=self.shimmer_columns)
 
-        self.mouseColumns = ['timestamp', 'mouse_event', 'x', 'y', 'button', 'pressed', 'scroll_x', 'scroll_y']
-        self.mouseData = pd.DataFrame(columns=self.mouseColumns)
+        self.mouse_columns = ['timestamp', 'mouse_event', 'x', 'y', 'button', 'pressed', 'scroll_x', 'scroll_y']
+        self.mouse_data = pd.DataFrame(columns=self.mouse_columns)
 
-        self.keyboardColumns = ['timestamp', 'keys']
-        self.keyboardData = pd.DataFrame(columns=self.keyboardColumns)
+        self.keyboard_columns = ['timestamp', 'keys']
+        self.keyboard_data = pd.DataFrame(columns=self.keyboard_columns)
 
-        self.startTime = datetime.datetime.now()
+        self.start_time = datetime.datetime.now()
         #
-        self.startRecording = False
+        self.start_recording = False
 
     def set_config(self, config):
         self.config = config
@@ -74,15 +75,15 @@ class PrecisionEmailSimulator(QtWidgets.QWidget):
 
         if self.config.get('welcomeText') != '':
             self.ui.welcomeText.setText(self.config.get('welcomeText'))
-        self.folderPath = self.config.get('saveLocation')
+        self.user_results_dir = self.config.get('saveLocation')
 
         self.ui.sensorsWidget.show()
 
     def start(self):
-        self.startRecording = True
+        self.start_recording = True
         self.make_user_results_dir()
         self.setup_user_results_dir()
-        if self.mouseAndKeyboard:
+        if self.mouse_and_keyboard:
             self.mouse_activity()
             self.keyboard_activity()
 
@@ -103,30 +104,30 @@ class PrecisionEmailSimulator(QtWidgets.QWidget):
         if self.ui.usernameBox.text() != '':
             user_results_dir = f"./{self.config.get('saveLocation')}/{self.ui.usernameBox.text()}"
             Path(user_results_dir).mkdir(parents=True, exist_ok=True)
-            self.folderPath = user_results_dir + '/'
+            self.user_results_dir = user_results_dir + '/'
         else:
-            user_results_dir = f"./{self.config.get('saveLocation')}/no_user_name/{self.startTime.strftime('%d-%m-%Y_%H-%M-%S')}"
+            user_results_dir = f"./{self.config.get('saveLocation')}/no_user_name/{self.start_time.strftime('%d-%m-%Y_%H-%M-%S')}"
             Path(user_results_dir).mkdir(parents=True, exist_ok=True)
-            self.folderPath = user_results_dir + '/'
+            self.user_results_dir = user_results_dir + '/'
 
     def setup_user_results_dir(self):
         # setup csv files in user results dir
-        if self.imotionConnection:
-            self.eyeData.to_csv(self.folderPath + self.startTime.strftime("%d-%m-%Y_%H-%M-%S") + '_eye.csv', index=False)
-            # self.shimmerData.to_csv(self.folder_path + self.startTime.strftime("%d-%m-%Y_%H-%M-%S") + '_shimmer.csv',
+        if self.imotion_connection:
+            self.eye_data.to_csv(self.user_results_dir + self.start_time.strftime("%d-%m-%Y_%H-%M-%S") + '_eye.csv', index=False)
+            # self.shimmer_data.to_csv(self.user_results_dir + self.start_time.strftime("%d-%m-%Y_%H-%M-%S") + '_shimmer.csv',
             #                         index=False)
-        if self.mouseAndKeyboard:
-            self.mouseData.to_csv(self.folderPath + self.startTime.strftime("%d-%m-%Y_%H-%M-%S") + '_mouse.csv',
-                                  index=False)
-            self.keyboardData.to_csv(self.folderPath + self.startTime.strftime("%d-%m-%Y_%H-%M-%S") + '_keyboard.csv',
-                                     index=False)
+        if self.mouse_and_keyboard:
+            self.mouse_data.to_csv(self.user_results_dir + self.start_time.strftime("%d-%m-%Y_%H-%M-%S") + '_mouse.csv',
+                                   index=False)
+            self.keyboard_data.to_csv(self.user_results_dir + self.start_time.strftime("%d-%m-%Y_%H-%M-%S") + '_keyboard.csv',
+                                      index=False)
 
     def verify_login(self):
 
         if self.login_ui.username.text() == 'uoavrclub@auckland.ac.nz' and self.login_ui.password.text() == 'VrClub123':
 
             study = pms_task_window.TaskWindow(self.ui.usernameBox.text(), self.config)
-            self.startRecording = True
+            self.start_recording = True
 
             study.ui.show()
             study.activateWindow()
@@ -153,53 +154,53 @@ class PrecisionEmailSimulator(QtWidgets.QWidget):
 
         def on_click(x, y, button, pressed):
             # print('c')
-            if self.startRecording:
-                self.mouseData = self.mouseData.append(
+            if self.start_recording:
+                self.mouse_data = self.mouse_data.append(
                     {'timestamp': time.time() * 1000, 'mouse_event': 'click', 'x': x, 'y': y, 'button': str(button),
                      'pressed': pressed, 'scroll_x': None,
                      'scroll_y': None}, ignore_index=True)
 
-                if self.mouseData.shape[0] > 20:
-                    print(self.folderPath)
-                    self.mouseData.to_csv(
-                        self.folderPath + self.startTime.strftime("%d-%m-%Y_%H-%M-%S") + '_mouse.csv',
+                if self.mouse_data.shape[0] > 20:
+                    print(self.user_results_dir)
+                    self.mouse_data.to_csv(
+                        self.user_results_dir + self.start_time.strftime("%d-%m-%Y_%H-%M-%S") + '_mouse.csv',
                         mode='a', header=False,
                         index=False)
-                    self.mouseData = self.mouseData.iloc[0:0]
+                    self.mouse_data = self.mouse_data.iloc[0:0]
 
         def on_scroll(x, y, dx, dy):
-            if self.startRecording:
-                self.mouseData = self.mouseData.append(
+            if self.start_recording:
+                self.mouse_data = self.mouse_data.append(
                     {'timestamp': time.time() * 1000, 'mouse_event': 'scroll', 'x': x, 'y': y, 'button': None,
                      'pressed': None, 'scroll_x': dx,
                      'scroll_y': dy}, ignore_index=True)
-                if self.mouseData.shape[0] > 20:
-                    self.mouseData.to_csv(
-                        self.folderPath + self.startTime.strftime("%d-%m-%Y_%H-%M-%S") + '_mouse.csv',
+                if self.mouse_data.shape[0] > 20:
+                    self.mouse_data.to_csv(
+                        self.user_results_dir + self.start_time.strftime("%d-%m-%Y_%H-%M-%S") + '_mouse.csv',
                         mode='a', header=False,
                         index=False)
-                    self.mouseData = self.mouseData.iloc[0:0]
+                    self.mouse_data = self.mouse_data.iloc[0:0]
 
         listener = mouse.Listener(on_click=on_click, on_scroll=on_scroll)
         listener.start()
 
     def keyboard_activity(self):
         def on_press(key):
-            if self.startRecording:
+            if self.start_recording:
                 try:
                     # Handle character keys
-                    self.keyboardData = self.keyboardData.append({'timestamp': time.time() * 1000, 'keys': str(key.char)}, ignore_index=True)
+                    self.keyboard_data = self.keyboard_data.append({'timestamp': time.time() * 1000, 'keys': str(key.char)}, ignore_index=True)
                 except AttributeError:
                     # Handle special keys (e.g., ctrl, alt, etc.)
-                    self.keyboardData = self.keyboardData.append({'timestamp': time.time() * 1000,  'keys': str(key)}, ignore_index=True)
+                    self.keyboard_data = self.keyboard_data.append({'timestamp': time.time() * 1000, 'keys': str(key)}, ignore_index=True)
 
-                if self.keyboardData.shape[0] > 20:
-                    print(self.folderPath)
-                    self.keyboardData.to_csv(
-                        self.folderPath + self.startTime.strftime("%d-%m-%Y_%H-%M-%S") + '_keyboard.csv',
+                if self.keyboard_data.shape[0] > 20:
+                    print(self.user_results_dir)
+                    self.keyboard_data.to_csv(
+                        self.user_results_dir + self.start_time.strftime("%d-%m-%Y_%H-%M-%S") + '_keyboard.csv',
                         mode='a', header=False,
                         index=False)
-                    self.keyboardData = self.keyboardData.iloc[0:0]
+                    self.keyboard_data = self.keyboard_data.iloc[0:0]
 
         listener = keyboard.Listener(on_press=on_press)
         listener.start()
@@ -219,64 +220,64 @@ class PrecisionEmailSimulator(QtWidgets.QWidget):
         self.setup_user_results_dir()
 
         try:
-            while self.imotionConnection:
+            while self.imotion_connection:
                 incoming_data_str = sock.recv(1024)
 
                 d = incoming_data_str.decode().split("\r\n")
-                for dataStr in d:
-                    data = dataStr.split(";")
-                    if self.startRecording:
+                for data_str in d:
+                    data = data_str.split(";")
+                    if self.start_recording:
                         if len(data) == 18:  # eye tracker data
                             row_df = pd.DataFrame(
                                 [[time.time() * 1000, data[3], data[6], data[7], data[8], data[9], data[10],
                                   data[11], data[12], data[13], data[14], data[15], data[16], data[17]]],
-                                columns=self.eyeColumns)
-                            self.eyeData = pd.concat([self.eyeData, row_df]).reset_index(drop=True)
-                            if self.eyeData.shape[0] > 1000:
-                                self.eyeData.to_csv(
-                                    self.folderPath + self.startTime.strftime("%d-%m-%Y_%H-%M-%S") + '_eye.csv',
+                                columns=self.eye_columns)
+                            self.eye_data = pd.concat([self.eye_data, row_df]).reset_index(drop=True)
+                            if self.eye_data.shape[0] > 1000:
+                                self.eye_data.to_csv(
+                                    self.user_results_dir + self.start_time.strftime("%d-%m-%Y_%H-%M-%S") + '_eye.csv',
                                     mode='a',
                                     header=False, index=False)
-                                self.eyeData = self.eyeData.iloc[0:0]
+                                self.eye_data = self.eye_data.iloc[0:0]
 
                         # elif len(data) == 19:  # shimmer data
                         #     row_df = pd.DataFrame(
                         #         [[time.time() * 1000, data[3], data[7], data[8], data[9], data[10], data[11],
                         #           data[12], data[13], data[14], data[15]]],
-                        #         columns=self.shimmerColumns)
-                        #     self.shimmerData = pd.concat([self.shimmerData, row_df]).reset_index(drop=True)
-                        #     if self.shimmerData.shape[0] > 1000:
-                        #         self.shimmerData.to_csv(
-                        #             self.folder_path + self.startTime.strftime("%d-%m-%Y_%H-%M-%S") + '_shimmer.csv',
+                        #         columns=self.shimmer_columns)
+                        #     self.shimmer_data = pd.concat([self.shimmer_data, row_df]).reset_index(drop=True)
+                        #     if self.shimmer_data.shape[0] > 1000:
+                        #         self.shimmer_data.to_csv(
+                        #             self.user_results_dir + self.start_time.strftime("%d-%m-%Y_%H-%M-%S") + '_shimmer.csv',
                         #             mode='a', header=False,
                         #             index=False)
-                        #         self.shimmerData = self.shimmerData.iloc[0:0]
+                        #         self.shimmer_data = self.shimmer_data.iloc[0:0]
 
                         elif len(data) == 10:  # mouse data
                             row_df = pd.DataFrame(
 
                                 [[time.time() * 1000, data[3], data[5], data[6], data[7], data[8]]],
-                                columns=self.mouseColumns)
-                            self.mouseData = pd.concat([self.mouseData, row_df]).reset_index(drop=True)
-                            if self.mouseData.shape[0] > 5:
-                                self.mouseData.to_csv(
-                                    self.folderPath + self.startTime.strftime("%d-%m-%Y_%H-%M-%S") + '_mouse.csv',
+                                columns=self.mouse_columns)
+                            self.mouse_data = pd.concat([self.mouse_data, row_df]).reset_index(drop=True)
+                            if self.mouse_data.shape[0] > 5:
+                                self.mouse_data.to_csv(
+                                    self.user_results_dir + self.start_time.strftime("%d-%m-%Y_%H-%M-%S") + '_mouse.csv',
                                     mode='a', header=False,
                                     index=False)
-                                self.mouseData = self.mouseData.iloc[0:0]
+                                self.mouse_data = self.mouse_data.iloc[0:0]
                             print("mouse data")
                             print(data)
                         elif len(data) == 6:  # keyboard data
                             row_df = pd.DataFrame(
                                 [[time.time() * 1000, data[3], data[5]]],
-                                columns=self.keyboardColumns)
-                            self.keyboardData = pd.concat([self.keyboardData, row_df]).reset_index(drop=True)
-                            if self.keyboardData.shape[0] > 5:
-                                self.keyboardData.to_csv(
-                                    self.folderPath + self.startTime.strftime("%d-%m-%Y_%H-%M-%S") + '_keyboard.csv',
+                                columns=self.keyboard_columns)
+                            self.keyboard_data = pd.concat([self.keyboard_data, row_df]).reset_index(drop=True)
+                            if self.keyboard_data.shape[0] > 5:
+                                self.keyboard_data.to_csv(
+                                    self.user_results_dir + self.start_time.strftime("%d-%m-%Y_%H-%M-%S") + '_keyboard.csv',
                                     mode='a', header=False,
                                     index=False)
-                                self.keyboardData = self.keyboardData.iloc[0:0]
+                                self.keyboard_data = self.keyboard_data.iloc[0:0]
 
                         # elif len(data) != 1:
                         #     print('unknown type of data')
@@ -290,6 +291,6 @@ class PrecisionEmailSimulator(QtWidgets.QWidget):
 
 if __name__ == '__main__':
     app = QApplication(sys.argv + ["--no-sandbox"])
-    mainWindow = PrecisionEmailSimulator()
-    mainWindow.ui.show()
+    main_window = PrecisionEmailSimulator()
+    main_window.ui.show()
     app.exec_()
