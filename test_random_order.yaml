@@ -1,5 +1,5 @@
 emailListLocation: testCSV.csv
-emailResourceLocation: ContentRelatedResources
+emailResourceLocation: emails_example
 saveLocation: results
 sessions:
   session1:
