@@ -15,7 +15,7 @@ from PySide2.QtUiTools import QUiLoader
 from PySide2.QtWebEngineWidgets import QWebEngineView, QWebEnginePage
 from PySide2.QtWidgets import QMessageBox, QTableWidgetItem, QStyleOptionViewItem, QStyle
 from pygame import mixer
-from win10toast import ToastNotifier
+from plyer import notification
 
 now = datetime.datetime.now()
 # Path("./data").mkdir(parents=True, exist_ok=True)
@@ -287,9 +287,7 @@ class TaskWindow(QtWidgets.QWidget):
             self.current_emails = self.current_emails.append(item, ignore_index=True)
             self.load_email_widget(item, True)
             email_list = email_list.iloc[1:, :]
-            ToastNotifier().show_toast('An email has arrived', item['title'], icon_path='resources/icon.ico',
-                                       duration=5,
-                                       threaded=True)
+            notification.notify(title=item['name'], message=item['title'], app_name="Mail", app_icon='resources/sender.ico')
         return email_list
 
     # load emails, input is the row of email
