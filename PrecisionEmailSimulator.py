@@ -21,7 +21,7 @@ class PrecisionEmailSimulator(QtWidgets.QWidget):
     def __init__(self):
         super(PrecisionEmailSimulator, self).__init__()
         self.ui = QUiLoader().load('resources/UI_files/welcome.ui')
-        self.study = None
+        self.config = None
         self.imotionConnection = True
         self.mouseAndKeyboard = True
 
@@ -57,7 +57,7 @@ class PrecisionEmailSimulator(QtWidgets.QWidget):
         self.startRecording = False
 
     def set_config(self, config):
-        self.study = config
+        self.config = config
         self.update_ui()
 
     def load_config(self):
@@ -67,25 +67,26 @@ class PrecisionEmailSimulator(QtWidgets.QWidget):
                                                   "*.yaml", options=options)
         if file_name:
             with open(file_name) as f:
-                self.study = yaml.load(f, Loader=yaml.SafeLoader)
+                self.config = yaml.load(f, Loader=yaml.SafeLoader)
                 self.update_ui()
 
     def update_ui(self):
 
-        if self.study.get('welcomeText') != '':
-            self.ui.welcomeText.setText(self.study.get('welcomeText'))
-        self.folderPath = self.study.get('saveLocation')
+        if self.config.get('welcomeText') != '':
+            self.ui.welcomeText.setText(self.config.get('welcomeText'))
+        self.folderPath = self.config.get('saveLocation')
 
         self.ui.sensorsWidget.show()
 
     def start(self):
         self.startRecording = True
-        self.setup_folder()
+        self.make_user_results_dir()
+        self.setup_user_results_dir()
         if self.mouseAndKeyboard:
             self.mouse_activity()
             self.keyboard_activity()
 
-        study = TaskWindow.TaskWindow(self.ui.usernameBox.text(), self.study)
+        study = TaskWindow.TaskWindow(self.ui.usernameBox.text(), self.config)
 
         study.ui.show()
         study.activateWindow()
@@ -98,16 +99,18 @@ class PrecisionEmailSimulator(QtWidgets.QWidget):
         #
         # self.login_ui.loginBtn.clicked.connect(self.verify_login)
 
-    def setup_folder(self):
-        # create folder and csv files
+    def make_user_results_dir(self):
         if self.ui.usernameBox.text() != '':
-            Path("./data/" + self.ui.usernameBox.text()).mkdir(parents=True, exist_ok=True)
-            self.folderPath = './data/' + self.ui.usernameBox.text() + '/'
+            user_results_dir = f"./{self.config.get('saveLocation')}/{self.ui.usernameBox.text()}"
+            Path(user_results_dir).mkdir(parents=True, exist_ok=True)
+            self.folderPath = user_results_dir + '/'
         else:
-            Path("./data/no_user_name/" + self.startTime.strftime("%d-%m-%Y_%H-%M-%S")).mkdir(parents=True,
-                                                                                              exist_ok=True)
-            self.folderPath = './data/no_user_name/' + self.startTime.strftime("%d-%m-%Y_%H-%M-%S") + '/'
+            user_results_dir = f"./{self.config.get('saveLocation')}/no_user_name/{self.startTime.strftime('%d-%m-%Y_%H-%M-%S')}"
+            Path(user_results_dir).mkdir(parents=True, exist_ok=True)
+            self.folderPath = user_results_dir + '/'
 
+    def setup_user_results_dir(self):
+        # setup csv files in user results dir
         if self.imotionConnection:
             self.eyeData.to_csv(self.folderPath + self.startTime.strftime("%d-%m-%Y_%H-%M-%S") + '_eye.csv', index=False)
             # self.shimmerData.to_csv(self.folder_path + self.startTime.strftime("%d-%m-%Y_%H-%M-%S") + '_shimmer.csv',
@@ -122,7 +125,7 @@ class PrecisionEmailSimulator(QtWidgets.QWidget):
 
         if self.login_ui.username.text() == 'uoavrclub@auckland.ac.nz' and self.login_ui.password.text() == 'VrClub123':
 
-            study = TaskWindow.TaskWindow(self.ui.usernameBox.text(), self.study)
+            study = TaskWindow.TaskWindow(self.ui.usernameBox.text(), self.config)
             self.startRecording = True
 
             study.ui.show()
@@ -211,23 +214,9 @@ class PrecisionEmailSimulator(QtWidgets.QWidget):
         sock.connect(server_address)
         label.setText("iMotion: Connected")
 
-        # create folder and csv files
-        if self.ui.usernameBox.text() != '':
-
-            Path("./data/" + self.ui.usernameBox.text()).mkdir(parents=True, exist_ok=True)
-            self.folderPath = './data/' + self.ui.usernameBox.text() + '/'
-        else:
-            Path("./data/no_user_name/" + self.startTime.strftime("%d-%m-%Y_%H-%M-%S")).mkdir(parents=True,
-                                                                                              exist_ok=True)
-            self.folderPath = './data/no_user_name/' + self.startTime.strftime("%d-%m-%Y_%H-%M-%S") + '/'
-
-        self.eyeData.to_csv(self.folderPath + self.startTime.strftime("%d-%m-%Y_%H-%M-%S") + '_eye.csv', index=False)
-        # self.shimmerData.to_csv(self.folder_path + self.startTime.strftime("%d-%m-%Y_%H-%M-%S") + '_shimmer.csv',
-        #                         index=False)
-        self.mouseData.to_csv(self.folderPath + self.startTime.strftime("%d-%m-%Y_%H-%M-%S") + '_mouse.csv',
-                              index=False)
-        self.keyboardData.to_csv(self.folderPath + self.startTime.strftime("%d-%m-%Y_%H-%M-%S") + '_keyboard.csv',
-                                 index=False)
+        # make user results dir (if it does not exist) and set up the dir
+        self.make_user_results_dir()
+        self.setup_user_results_dir()
 
         try:
             while self.imotionConnection:

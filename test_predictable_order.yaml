@@ -1,6 +1,6 @@
 emailListLocation: testCSV.csv
 emailResourceLocation: ContentRelatedResources
-saveLocation: data
+saveLocation: results
 sessions:
   session1:
     name: session1
@@ -19,17 +19,17 @@ sessions:
     legitEmails:
       emailListRange:
         start: '101'
-        finish: '110'
-      shuffleEmails: true
+        finish: '116'
+      shuffleEmails: false
       incomingRange:
-        start: '111'
-        finish: '120'
+        start: ''
+        finish: ''
     phishEmails:
-      emailList: 1,2,3,4
+      emailList: 1,2,3,4,5,6
       randomLoc: false
-      emailListLocations: 2,4,6
-      shuffleEmails: true
-      emailListNum: '3'
-      incomingList: 5,6
-      incomingLocations: 1,2
-      incomingNum: '2'
+      emailListLocations: 3,4,8,15,17,19
+      shuffleEmails: false
+      emailListNum: '6'
+      incomingList: ''
+      incomingLocations: ''
+      incomingNum: '0'
