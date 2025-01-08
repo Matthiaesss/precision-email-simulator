@@ -17,7 +17,6 @@ import pms_task_window
 
 
 class PrecisionEmailSimulator(QtWidgets.QWidget):
-
     def __init__(self):
         super(PrecisionEmailSimulator, self).__init__()
         self.ui = QUiLoader().load('resources/UI_files/welcome.ui')
@@ -122,11 +121,9 @@ class PrecisionEmailSimulator(QtWidgets.QWidget):
                 self.update_ui()
 
     def update_ui(self):
-
         if self.config.get('welcomeText') != '':
             self.ui.welcomeText.setText(self.config.get('welcomeText'))
         self.user_results_dir = self.config.get('saveLocation')
-
         self.ui.sensorsWidget.show()
 
     def start(self):
@@ -170,9 +167,7 @@ class PrecisionEmailSimulator(QtWidgets.QWidget):
                                       index=False)
 
     def verify_login(self):
-
         if self.login_ui.username.text() == 'uoavrclub@auckland.ac.nz' and self.login_ui.password.text() == 'VrClub123':
-
             study = pms_task_window.TaskWindow(self.ui.usernameBox.text(), self.config)
             self.start_recording = True
 
@@ -180,7 +175,6 @@ class PrecisionEmailSimulator(QtWidgets.QWidget):
             study.activateWindow()
             self.login_ui.close()
             self.ui.close()
-
         else:
             msg_box = QMessageBox()
             msg_box.setIcon(QMessageBox.Information)
@@ -231,7 +225,6 @@ class PrecisionEmailSimulator(QtWidgets.QWidget):
                                     mode='a',
                                     header=False, index=False)
                                 self.eye_data = self.eye_data.iloc[0:0]
-
                         # elif len(data) == 19:  # shimmer data
                         #     row_df = pd.DataFrame(
                         #         [[time.time() * 1000, data[3], data[7], data[8], data[9], data[10], data[11],
@@ -244,10 +237,8 @@ class PrecisionEmailSimulator(QtWidgets.QWidget):
                         #             mode='a', header=False,
                         #             index=False)
                         #         self.shimmer_data = self.shimmer_data.iloc[0:0]
-
                         elif len(data) == 10:  # mouse data
                             row_df = pd.DataFrame(
-
                                 [[time.time() * 1000, data[3], data[5], data[6], data[7], data[8]]],
                                 columns=self.mouse_columns)
                             self.mouse_data = pd.concat([self.mouse_data, row_df]).reset_index(drop=True)
@@ -270,7 +261,6 @@ class PrecisionEmailSimulator(QtWidgets.QWidget):
                                     mode='a', header=False,
                                     index=False)
                                 self.keyboard_data = self.keyboard_data.iloc[0:0]
-
                         # elif len(data) != 1:
                         #     print('unknown type of data')
                         #     print(data)

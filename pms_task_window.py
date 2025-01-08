@@ -7,7 +7,6 @@ import time
 import webbrowser
 from pathlib import Path
 
-import pandas
 import pandas as pd
 from PySide6 import QtGui, QtCore, QtWidgets, QtWebChannel, QtWebEngineWidgets
 from PySide6.QtCore import QRectF, QSize, Qt
@@ -16,8 +15,8 @@ from PySide6.QtUiTools import QUiLoader
 from PySide6.QtWebEngineCore import QWebEnginePage
 from PySide6.QtWebEngineWidgets import QWebEngineView
 from PySide6.QtWidgets import QMessageBox, QTableWidgetItem, QStyleOptionViewItem, QStyle
-from pygame import mixer
 from plyer import notification
+from pygame import mixer
 
 now = datetime.datetime.now()
 # Path("./data").mkdir(parents=True, exist_ok=True)
@@ -134,8 +133,6 @@ class TaskWindow(QtWidgets.QWidget):
                     message_notification(self,
                                          self.get_current_session().get('endSessionPopup'))
 
-                # check if it is the last session
-
             # add some notification for countdown
             elif (self.count_down_counter / 60) in self.audio_notification_times:
                 self.beep.play()
@@ -153,9 +150,6 @@ class TaskWindow(QtWidgets.QWidget):
         if self.incoming_email_timer.isActive():  # turn off the incoming email timer
             self.incoming_email_timer.stop()
         self.count_down_counter = 1
-        # if self.get_current_session().get('primaryTaskHtml') != '':
-        #     print('xxxxxxxxxxxxxxxxxxxxxx')
-        #     self.save_primary_task_data_local()
 
     def setup_incoming_email_timer(self, session_config):
         print('setting up incoming timer')
@@ -256,7 +250,6 @@ class TaskWindow(QtWidgets.QWidget):
             p_email_incoming = p_email_incoming.sample(frac=1).reset_index(drop=True)
             p_email_incoming = p_email_incoming.iloc[:int(session_config.get('phishEmails').get('incomingNum'))]
 
-
         self.current_emails = self.insert_p_email_to_list(p_email_inbox, self.current_emails, 'emailListLocations', session_config)
         if session_config.get('incomingEmails'):
             self.incoming_emails = self.insert_p_email_to_list(p_email_incoming, self.incoming_emails, 'incomingLocations', session_config)
@@ -277,7 +270,6 @@ class TaskWindow(QtWidgets.QWidget):
                 elist.loc[loc_list[i] - 1.5] = plist.iloc[0]
                 plist = plist.iloc[1:]
                 elist = elist.sort_index().reset_index(drop=True)
-
         return elist
 
     # =======================  email set up ===============================================
@@ -362,7 +354,6 @@ class TaskWindow(QtWidgets.QWidget):
         else:
             self.ui.close()
 
-    # noinspection PyUnresolvedReferences
     def setup_primary_task(self):
         # read html file
         clear_layout(self.ui.primaryTaskL)
@@ -389,7 +380,6 @@ class TaskWindow(QtWidgets.QWidget):
         """
         )
 
-    # noinspection PyCallingNonCallable
     @QtCore.Slot(str)
     def get_task_data(self, value):
         print('....................')
@@ -406,7 +396,6 @@ class TaskWindow(QtWidgets.QWidget):
                 row = row + ['', '', '', '', '']
 
             data.loc[len(data)] = row
-
         data.to_csv(str(path), index=False, header=False)
 
     # ========================= logging ==========================================
@@ -415,7 +404,6 @@ class TaskWindow(QtWidgets.QWidget):
         print('create log file')
         self.folder_path = os.path.join(self.save_location, self.username)
         Path(self.folder_path).mkdir(parents=True, exist_ok=True)
-        # self.folder_path = './data/' + self.username + '/'
         self.file_name = os.path.join(self.folder_path, now.strftime("%d-%m-%Y_%H-%M-%S") + '_log.csv')
 
         # self.file_name = self.folder_path + now.strftime("%d-%m-%Y_%H-%M-%S") + '_log.csv'
@@ -426,7 +414,6 @@ class TaskWindow(QtWidgets.QWidget):
         with open(self.file_name, 'w', newline='') as file:
             writer = csv.writer(file)
             writer.writerow(["time", "timestamp", "username", "ID", "email", "action", "detail", "studyCondition"])
-        # else:
 
     def log_email(self, action, detail=""):
         email = self.get_current_email()
@@ -469,7 +456,6 @@ class TaskWindow(QtWidgets.QWidget):
 
     def email_table_clicked(self):
         self.display_email()
-
         self.log_email("email opened")
 
     @staticmethod
@@ -492,7 +478,6 @@ class TaskWindow(QtWidgets.QWidget):
         self.respond_window.setWindowFlags(QtCore.Qt.WindowCloseButtonHint)
         self.respond_window.deleteBtn.clicked.connect(self.respond_window.reject)
         self.respond_window.sendBtn.clicked.connect(lambda: self.reply_send_btn_clicked(response_type))
-
         self.respond_window.show()
 
     def respond_btn_clicked(self, types):
@@ -501,9 +486,7 @@ class TaskWindow(QtWidgets.QWidget):
 
         # set up the sender, subject line etc.
         if types == 'reply':
-
             self.set_window("reply")
-
             self.respond_window.toText.setText(current_email['name'])
             self.respond_window.ccText.setHidden(True)
             self.respond_window.ccLine.setHidden(True)
@@ -513,9 +496,7 @@ class TaskWindow(QtWidgets.QWidget):
             self.log_email("reply button clicked")
 
         elif types == 'reply_to_all':
-
             self.set_window("reply")
-
             self.respond_window.toText.setText(current_email['name'])
             to_addresses = current_email['to'].split(', ')
             if 'me' in to_addresses:
@@ -525,7 +506,6 @@ class TaskWindow(QtWidgets.QWidget):
             self.respond_window.content.setFocus()
             self.log_email("reply to all button clicked")
         else:
-
             self.set_window("forward")
             self.respond_window.subjectLine.setText('Forward: ' + current_email['title'])
             self.log_email("forward button clicked")
@@ -558,29 +538,19 @@ class TaskWindow(QtWidgets.QWidget):
         index = self.current_emails.index[self.current_emails['ID'] == current['ID']].tolist()[0]
 
         # check star state and toggle it
-        if self.get_current_email()['star']:
-            self.current_emails.at[index, 'star'] = False
-            self.log_email("email unstared")
-
-        else:
-            self.current_emails.at[index, 'star'] = True
-            self.log_email("email stared")
+        self.current_emails.at[index, 'star'] = not self.get_current_email()['star']
+        self.log_email(f"email {'un' if self.get_current_email()['star'] else ''}star")
 
         self.set_email_row_font_colour(self.get_current_email())
         self.update_star(self.current_emails.at[index, 'star'])
 
     def update_star(self, value):
-        if value:
-            self.ui.starBtn.setIcon(QtGui.QPixmap("resources/star_activate.png"))
-        else:
-            self.ui.starBtn.setIcon(QtGui.QPixmap("resources/star.png"))
+        self.ui.starBtn.setIcon(QtGui.QPixmap(f"resources/{'star_activate' if value else 'star'}.png"))
 
     def delete_btn_click(self):
         # self.send_popup('The email has been deleted', 3)
         self.log_email("email deleted")
         self.remove_current_selected_email()
-
-        # logging
 
     def report_btn_click(self):
         # self.send_popup('The email has been reported', 3)
@@ -590,7 +560,6 @@ class TaskWindow(QtWidgets.QWidget):
 
         self.remove_current_selected_email()
         message_notification(self, "You have reported the selected email", False)
-        # logging
 
     def remove_current_selected_email(self):
         # print(self.current_emails)
@@ -647,9 +616,7 @@ class TaskWindow(QtWidgets.QWidget):
         self.current_email = item
 
         self.current_emails.loc[self.current_emails['ID'] == item['ID'], 'readState'] = True
-
         self.set_unread_email_count()
-
         self.set_email_row_font_colour(item)
 
         # set subject line
@@ -661,10 +628,7 @@ class TaskWindow(QtWidgets.QWidget):
         # set to address
         self.ui.toAddress.setText('to ' + item['to'])
 
-        if self.get_current_session().get('cssStyles'):
-            self.setup_email_css(item['category'])
-        else:
-            self.reset_css()
+        self.setup_email_css(item['category']) if self.get_current_session().get('cssStyles') else self.reset_css()
 
         # set the content
         clear_layout(self.ui.contentL)
@@ -693,16 +657,10 @@ class TaskWindow(QtWidgets.QWidget):
 
             space_item = QtWidgets.QSpacerItem(150, 10, QtWidgets.QSizePolicy.Expanding)
             self.ui.attachmentLayout.addSpacerItem(space_item)
-
-        if item['to'] == 'me':
-            self.ui.replyToAllBtn.setHidden(True)
-        else:
-            self.ui.replyToAllBtn.setHidden(False)
+        self.ui.replyToAllBtn.setHidden(item['to'] == 'me')
 
     def link_hovered(self, link):
-        if (link == "") and (self.hovered_url == 'none'):
-            pass
-        else:
+        if not ((link == "") and (self.hovered_url == 'none')):
             self.hovered_url = link
             print(self.hovered_url)
 
@@ -841,7 +799,6 @@ def message_notification(context, text, new_section=True):
     return_value = msg_box.exec()
     if (return_value == QMessageBox.Ok) and new_section:
         print('OK clicked')
-
         context.get_next_section()
 
 
@@ -856,7 +813,7 @@ def insert_row_(row_number, df, row_value):
     # Concat the two dataframes
     df_result = pd.concat([df1, df2])
     # Reassign the index labels
-    df_result.index = pandas.Index(data=[*range(df_result.shape[0])])
+    df_result.index = pd.Index(data=[*range(df_result.shape[0])])
     # Return the updated dataframe
     return df_result
 
@@ -893,7 +850,6 @@ class PrimaryTaskData(QtCore.QObject):
     def value(self):
         return self._value
 
-    # noinspection PyUnresolvedReferences
     @value.setter
     def value(self, v):
         self._value = v

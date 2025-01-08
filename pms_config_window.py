@@ -7,10 +7,9 @@ from pms_main import PrecisionEmailSimulator
 
 
 class ConfigPage(QtWidgets.QWidget):
-
     def __init__(self):
         super(ConfigPage, self).__init__()
-        self.ui = QUiLoader().load('resources/UI_files/config_page2.ui')
+        self.ui = QUiLoader().load('resources/UI_files/config_page.ui')
         self.ui.resize(600, 600)
         # variables
         self.study = dict({
@@ -36,7 +35,6 @@ class ConfigPage(QtWidgets.QWidget):
             lambda: self.update_text_field(self.ui.resourcePath, self.study, 'emailResourceLocation'))
         self.ui.savePath.editingFinished.connect(
             lambda: self.update_text_field(self.ui.savePath, self.study, 'saveLocation'))
-
 
         # twice because one for update after click on button
         # self.ui.htmlPath.editingFinished.connect(
@@ -155,11 +153,8 @@ class ConfigPage(QtWidgets.QWidget):
                                                                       'and add into the inbox. When location of the phishing emails are specified, the number should be consistant.'
                                                                       '\nNote: shuffling emails would apply to both phishing emails in the inbox, and incoming phishing emails.'))
 
-
         self.ui.saveConfigBtn.clicked.connect(self.save_config)
         self.ui.openConfigBtn.clicked.connect(self.load_config)
-        # self.ui.previewBtn.clicked.connect(self.get_current_session)
-
         self.ui.previewBtn.clicked.connect(self.preview_study)
 
         self.add_new_session()
@@ -223,10 +218,10 @@ class ConfigPage(QtWidgets.QWidget):
             self.update_check_box_related_fields()
 
     def add_new_session(self):
-        print('clicked')
         sessions = self.study.get('sessions')
-        print(len(sessions))
         session_name = 'session' + str(len(sessions) + 1)
+        print('clicked')
+        print(len(sessions))
         print(session_name)
         sessions[session_name] = {
             'name': session_name,
@@ -255,7 +250,6 @@ class ConfigPage(QtWidgets.QWidget):
         self.ui.sessionSelectDB.setCurrentText(self.current_session)
 
     def update_check_box_related_fields(self):
-
         if self.ui.phishEmailCB.isChecked():
             self.ui.phishEmailWidget.show()
         else:
@@ -289,32 +283,24 @@ class ConfigPage(QtWidgets.QWidget):
 
     # ========================================================================
     def add_new_legit(self):
-
         self.get_current_session()['legitEmails'] = {
             'emailListRange': {'start': '', 'finish': ''},
             'shuffleEmails': False,
             'incomingRange': {'start': '', 'finish': ''},
         }
-
         print(self.get_current_session())
-
         self.update_check_box_related_fields()
 
-        # update the dictionary
-
     def add_new_phish(self):
-
         self.get_current_session()['phishEmails'] = {
             'emailList': '',
             'randomLoc': False,
             'emailListLocations': '',
             'shuffleEmails': False,
             'emailListNum': '',
-
             'incomingList': '',
             'incomingLocations': '',
             'incomingNum': '',
-
         }
         self.update_check_box_related_fields()
 
@@ -336,7 +322,6 @@ class ConfigPage(QtWidgets.QWidget):
             if element.text() != '':
                 try:
                     float(element.text())
-
                 except ValueError:
                     message_notification('Error', 'input field ' + element.objectName() + ' should be a number')
                     return False
@@ -362,15 +347,12 @@ class ConfigPage(QtWidgets.QWidget):
             for audio_notification_time in self.ui.sessionDuration.text().split(','):
                 if int(audio_notification_time) > int(self.ui.sessionDuration.text()):
                     message_notification('Error', 'All audio notification times most be less than the sesison duration')
-
                     return False
-
         return True
 
     def save_config(self):
         print(self.study)
         if self.check_data_type():
-
             options = QFileDialog.Options()
             options |= QFileDialog.DontUseNativeDialog
             file_name, _ = QFileDialog.getSaveFileName(self, "Save config file", "./",
@@ -402,7 +384,6 @@ class ConfigPage(QtWidgets.QWidget):
             # self.updateSessionTabUi()
 
     def update_load_file_section(self):
-
         self.ui.emailPath.setText(self.study.get('emailListLocation'))
         self.ui.resourcePath.setText(self.study.get('emailResourceLocation'))
         self.ui.savePath.setText(self.study.get('saveLocation'))
@@ -426,7 +407,6 @@ class ConfigPage(QtWidgets.QWidget):
         self.ui.timeCountDownCB.setChecked(self.get_current_session().get('timeCountDown'))
 
     def update_legit_tab_ui(self):
-
         self.ui.listStart_L.setText(self.get_current_legit().get('emailListRange').get('start'))
         self.ui.listEnd_L.setText(self.get_current_legit().get('emailListRange').get('finish'))
         self.ui.incomingStart_L.setText(self.get_current_legit().get('incomingRange').get('start'))
@@ -435,7 +415,6 @@ class ConfigPage(QtWidgets.QWidget):
         self.ui.shuffleCB_L.setChecked(self.get_current_legit().get('shuffleEmails'))
 
     def update_phish_tab_ui(self):
-
         self.ui.emailNum_P.setText(self.get_current_phish().get('emailListNum'))
         self.ui.emailList_P.setText(self.get_current_phish().get('emailList'))
         self.ui.emailLoc_P.setText(self.get_current_phish().get('emailListLocations'))
