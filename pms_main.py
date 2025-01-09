@@ -54,8 +54,58 @@ class PrecisionEmailSimulator(QtWidgets.QWidget):
         self.keyboard_data = pd.DataFrame(columns=self.keyboard_columns)
 
         self.start_time = datetime.datetime.now()
-        #
+
         self.start_recording = False
+
+        def _on_click(x, y, button, pressed):
+            if self.start_recording:
+                self.mouse_data = self.mouse_data.append(
+                    {'timestamp': time.time() * 1000, 'mouse_event': 'click', 'x': x, 'y': y, 'button': str(button),
+                     'pressed': pressed, 'scroll_x': None,
+                     'scroll_y': None}, ignore_index=True)
+
+                if self.mouse_data.shape[0] > 20:
+                    print(self.user_results_dir)
+                    self.mouse_data.to_csv(
+                        self.user_results_dir + self.start_time.strftime("%d-%m-%Y_%H-%M-%S") + '_mouse.csv',
+                        mode='a', header=False,
+                        index=False)
+                    self.mouse_data = self.mouse_data.iloc[0:0]
+
+        def _on_scroll(x, y, dx, dy):
+            if self.start_recording:
+                self.mouse_data = self.mouse_data.append(
+                    {'timestamp': time.time() * 1000, 'mouse_event': 'scroll', 'x': x, 'y': y, 'button': None,
+                     'pressed': None, 'scroll_x': dx,
+                     'scroll_y': dy}, ignore_index=True)
+                if self.mouse_data.shape[0] > 20:
+                    self.mouse_data.to_csv(
+                        self.user_results_dir + self.start_time.strftime("%d-%m-%Y_%H-%M-%S") + '_mouse.csv',
+                        mode='a', header=False,
+                        index=False)
+                    self.mouse_data = self.mouse_data.iloc[0:0]
+
+        def _on_press(key):
+            if self.start_recording:
+                try:
+                    # Handle character keys
+                    self.keyboard_data = self.keyboard_data.append({'timestamp': time.time() * 1000, 'keys': str(key.char)}, ignore_index=True)
+                except AttributeError:
+                    # Handle special keys (e.g., ctrl, alt, etc.)
+                    self.keyboard_data = self.keyboard_data.append({'timestamp': time.time() * 1000, 'keys': str(key)}, ignore_index=True)
+
+                if self.keyboard_data.shape[0] > 20:
+                    print(self.user_results_dir)
+                    self.keyboard_data.to_csv(
+                        self.user_results_dir + self.start_time.strftime("%d-%m-%Y_%H-%M-%S") + '_keyboard.csv',
+                        mode='a', header=False,
+                        index=False)
+                    self.keyboard_data = self.keyboard_data.iloc[0:0]
+
+        self.mouse_listener = mouse.Listener(on_click=_on_click, on_scroll=_on_scroll)
+        self.keyboard_listener = keyboard.Listener(on_press=_on_press)
+        self.mouse_listener.start()
+        self.keyboard_listener.start()
 
     def set_config(self, config):
         self.config = config
@@ -83,9 +133,6 @@ class PrecisionEmailSimulator(QtWidgets.QWidget):
         self.start_recording = True
         self.make_user_results_dir()
         self.setup_user_results_dir()
-        if self.mouse_and_keyboard:
-            self.mouse_activity()
-            self.keyboard_activity()
 
         study = pms_task_window.TaskWindow(self.ui.usernameBox.text(), self.config)
 
@@ -149,61 +196,6 @@ class PrecisionEmailSimulator(QtWidgets.QWidget):
         background_thread = threading.Thread(target=self.imotion_connect, args=(label,))
         background_thread.deamon = True
         background_thread.start()
-
-    def mouse_activity(self):
-
-        def on_click(x, y, button, pressed):
-            # print('c')
-            if self.start_recording:
-                self.mouse_data = self.mouse_data.append(
-                    {'timestamp': time.time() * 1000, 'mouse_event': 'click', 'x': x, 'y': y, 'button': str(button),
-                     'pressed': pressed, 'scroll_x': None,
-                     'scroll_y': None}, ignore_index=True)
-
-                if self.mouse_data.shape[0] > 20:
-                    print(self.user_results_dir)
-                    self.mouse_data.to_csv(
-                        self.user_results_dir + self.start_time.strftime("%d-%m-%Y_%H-%M-%S") + '_mouse.csv',
-                        mode='a', header=False,
-                        index=False)
-                    self.mouse_data = self.mouse_data.iloc[0:0]
-
-        def on_scroll(x, y, dx, dy):
-            if self.start_recording:
-                self.mouse_data = self.mouse_data.append(
-                    {'timestamp': time.time() * 1000, 'mouse_event': 'scroll', 'x': x, 'y': y, 'button': None,
-                     'pressed': None, 'scroll_x': dx,
-                     'scroll_y': dy}, ignore_index=True)
-                if self.mouse_data.shape[0] > 20:
-                    self.mouse_data.to_csv(
-                        self.user_results_dir + self.start_time.strftime("%d-%m-%Y_%H-%M-%S") + '_mouse.csv',
-                        mode='a', header=False,
-                        index=False)
-                    self.mouse_data = self.mouse_data.iloc[0:0]
-
-        listener = mouse.Listener(on_click=on_click, on_scroll=on_scroll)
-        listener.start()
-
-    def keyboard_activity(self):
-        def on_press(key):
-            if self.start_recording:
-                try:
-                    # Handle character keys
-                    self.keyboard_data = self.keyboard_data.append({'timestamp': time.time() * 1000, 'keys': str(key.char)}, ignore_index=True)
-                except AttributeError:
-                    # Handle special keys (e.g., ctrl, alt, etc.)
-                    self.keyboard_data = self.keyboard_data.append({'timestamp': time.time() * 1000, 'keys': str(key)}, ignore_index=True)
-
-                if self.keyboard_data.shape[0] > 20:
-                    print(self.user_results_dir)
-                    self.keyboard_data.to_csv(
-                        self.user_results_dir + self.start_time.strftime("%d-%m-%Y_%H-%M-%S") + '_keyboard.csv',
-                        mode='a', header=False,
-                        index=False)
-                    self.keyboard_data = self.keyboard_data.iloc[0:0]
-
-        listener = keyboard.Listener(on_press=on_press)
-        listener.start()
 
     def imotion_connect(self, label):
         # Create a TCP/IP socket

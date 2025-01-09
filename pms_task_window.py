@@ -2,6 +2,7 @@ import csv
 import datetime
 import os
 import random
+import sys
 import time
 import webbrowser
 from pathlib import Path
@@ -288,7 +289,8 @@ class TaskWindow(QtWidgets.QWidget):
             self.current_emails = self.current_emails.append(item, ignore_index=True)
             self.load_email_widget(item, True)
             email_list = email_list.iloc[1:, :]
-            notification.notify(title=item['name'], message=item['title'], app_name="Mail", app_icon='resources/sender.ico')
+            if sys.platform != 'darwin':
+                notification.notify(title=item['name'], message=item['title'], app_name="Mail", app_icon='resources/sender.ico')
         return email_list
 
     # load emails, input is the row of email
