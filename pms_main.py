@@ -66,7 +66,7 @@ class PrecisionEmailSimulator(QtWidgets.QWidget):
                 if self.mouse_data.shape[0] > 20:
                     print(self.user_results_dir)
                     self.mouse_data.to_csv(
-                        self.user_results_dir + self.start_time.strftime("%d-%m-%Y_%H-%M-%S") + '_mouse.csv',
+                        self.user_results_dir + self.start_time.strftime(f'{pms_task_window.DATE_FORMAT}_{pms_task_window.LONG_TIME_FORMAT}') + '_mouse.csv',
                         mode='a', header=False,
                         index=False)
                     self.mouse_data = self.mouse_data.iloc[0:0]
@@ -79,7 +79,7 @@ class PrecisionEmailSimulator(QtWidgets.QWidget):
                      'scroll_y': dy}, ignore_index=True)
                 if self.mouse_data.shape[0] > 20:
                     self.mouse_data.to_csv(
-                        self.user_results_dir + self.start_time.strftime("%d-%m-%Y_%H-%M-%S") + '_mouse.csv',
+                        self.user_results_dir + self.start_time.strftime(f'{pms_task_window.DATE_FORMAT}_{pms_task_window.LONG_TIME_FORMAT}') + '_mouse.csv',
                         mode='a', header=False,
                         index=False)
                     self.mouse_data = self.mouse_data.iloc[0:0]
@@ -96,7 +96,7 @@ class PrecisionEmailSimulator(QtWidgets.QWidget):
                 if self.keyboard_data.shape[0] > 20:
                     print(self.user_results_dir)
                     self.keyboard_data.to_csv(
-                        self.user_results_dir + self.start_time.strftime("%d-%m-%Y_%H-%M-%S") + '_keyboard.csv',
+                        self.user_results_dir + self.start_time.strftime(f'{pms_task_window.DATE_FORMAT}_{pms_task_window.LONG_TIME_FORMAT}') + '_keyboard.csv',
                         mode='a', header=False,
                         index=False)
                     self.keyboard_data = self.keyboard_data.iloc[0:0]
@@ -150,20 +150,20 @@ class PrecisionEmailSimulator(QtWidgets.QWidget):
             Path(user_results_dir).mkdir(parents=True, exist_ok=True)
             self.user_results_dir = user_results_dir + '/'
         else:
-            user_results_dir = f"./{self.config.get('saveLocation')}/no_user_name/{self.start_time.strftime('%d-%m-%Y_%H-%M-%S')}"
+            user_results_dir = f"./{self.config.get('saveLocation')}/no_user_name/{self.start_time.strftime(f'{pms_task_window.DATE_FORMAT}_{pms_task_window.LONG_TIME_FORMAT}')}"
             Path(user_results_dir).mkdir(parents=True, exist_ok=True)
             self.user_results_dir = user_results_dir + '/'
 
     def setup_user_results_dir(self):
         # setup csv files in user results dir
         if self.imotion_connection:
-            self.eye_data.to_csv(self.user_results_dir + self.start_time.strftime("%d-%m-%Y_%H-%M-%S") + '_eye.csv', index=False)
-            # self.shimmer_data.to_csv(self.user_results_dir + self.start_time.strftime("%d-%m-%Y_%H-%M-%S") + '_shimmer.csv',
+            self.eye_data.to_csv(self.user_results_dir + self.start_time.strftime(f'{pms_task_window.DATE_FORMAT}_{pms_task_window.LONG_TIME_FORMAT}') + '_eye.csv', index=False)
+            # self.shimmer_data.to_csv(self.user_results_dir + self.start_time.strftime(f'{pms_task_window.DATE_FORMAT}_{pms_task_window.LONG_TIME_FORMAT}') + '_shimmer.csv',
             #                         index=False)
         if self.mouse_and_keyboard:
-            self.mouse_data.to_csv(self.user_results_dir + self.start_time.strftime("%d-%m-%Y_%H-%M-%S") + '_mouse.csv',
+            self.mouse_data.to_csv(self.user_results_dir + self.start_time.strftime(f'{pms_task_window.DATE_FORMAT}_{pms_task_window.LONG_TIME_FORMAT}') + '_mouse.csv',
                                    index=False)
-            self.keyboard_data.to_csv(self.user_results_dir + self.start_time.strftime("%d-%m-%Y_%H-%M-%S") + '_keyboard.csv',
+            self.keyboard_data.to_csv(self.user_results_dir + self.start_time.strftime(f'{pms_task_window.DATE_FORMAT}_{pms_task_window.LONG_TIME_FORMAT}') + '_keyboard.csv',
                                       index=False)
 
     def verify_login(self):
@@ -221,7 +221,7 @@ class PrecisionEmailSimulator(QtWidgets.QWidget):
                             self.eye_data = pd.concat([self.eye_data, row_df]).reset_index(drop=True)
                             if self.eye_data.shape[0] > 1000:
                                 self.eye_data.to_csv(
-                                    self.user_results_dir + self.start_time.strftime("%d-%m-%Y_%H-%M-%S") + '_eye.csv',
+                                    self.user_results_dir + self.start_time.strftime(f'{pms_task_window.DATE_FORMAT}_{pms_task_window.LONG_TIME_FORMAT}') + '_eye.csv',
                                     mode='a',
                                     header=False, index=False)
                                 self.eye_data = self.eye_data.iloc[0:0]
@@ -233,7 +233,7 @@ class PrecisionEmailSimulator(QtWidgets.QWidget):
                         #     self.shimmer_data = pd.concat([self.shimmer_data, row_df]).reset_index(drop=True)
                         #     if self.shimmer_data.shape[0] > 1000:
                         #         self.shimmer_data.to_csv(
-                        #             self.user_results_dir + self.start_time.strftime("%d-%m-%Y_%H-%M-%S") + '_shimmer.csv',
+                        #             self.user_results_dir + self.start_time.strftime(f'{pms_task_window.DATE_FORMAT}_{pms_task_window.LONG_TIME_FORMAT}' + '_shimmer.csv',
                         #             mode='a', header=False,
                         #             index=False)
                         #         self.shimmer_data = self.shimmer_data.iloc[0:0]
@@ -244,7 +244,7 @@ class PrecisionEmailSimulator(QtWidgets.QWidget):
                             self.mouse_data = pd.concat([self.mouse_data, row_df]).reset_index(drop=True)
                             if self.mouse_data.shape[0] > 5:
                                 self.mouse_data.to_csv(
-                                    self.user_results_dir + self.start_time.strftime("%d-%m-%Y_%H-%M-%S") + '_mouse.csv',
+                                    self.user_results_dir + self.start_time.strftime(f'{pms_task_window.DATE_FORMAT}_{pms_task_window.LONG_TIME_FORMAT}') + '_mouse.csv',
                                     mode='a', header=False,
                                     index=False)
                                 self.mouse_data = self.mouse_data.iloc[0:0]
@@ -257,7 +257,7 @@ class PrecisionEmailSimulator(QtWidgets.QWidget):
                             self.keyboard_data = pd.concat([self.keyboard_data, row_df]).reset_index(drop=True)
                             if self.keyboard_data.shape[0] > 5:
                                 self.keyboard_data.to_csv(
-                                    self.user_results_dir + self.start_time.strftime("%d-%m-%Y_%H-%M-%S") + '_keyboard.csv',
+                                    self.user_results_dir + self.start_time.strftime(f'{pms_task_window.DATE_FORMAT}_{pms_task_window.LONG_TIME_FORMAT}') + '_keyboard.csv',
                                     mode='a', header=False,
                                     index=False)
                                 self.keyboard_data = self.keyboard_data.iloc[0:0]

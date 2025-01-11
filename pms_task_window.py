@@ -18,31 +18,12 @@ from PySide6.QtWidgets import QMessageBox, QTableWidgetItem, QStyleOptionViewIte
 from plyer import notification
 from pygame import mixer
 
-now = datetime.datetime.now()
-# Path("./data").mkdir(parents=True, exist_ok=True)
-column_names = ['ID', 'name', 'from', 'to', 'title', 'content', 'attachment', 'star', 'time', 'readState', 'category']
-
-log_file_name = ''
-
-# for changing resolution
-# if hasattr(QtCore.Qt, 'AA_EnableHighDpiScaling'):
-#     QtWidgets.QApplication.setAttribute(QtCore.Qt.AA_EnableHighDpiScaling, True)
-#
-# if hasattr(QtCore.Qt, 'AA_UseHighDpiPixmaps'):
-#     QtWidgets.QApplication.setAttribute(QtCore.Qt.AA_UseHighDpiPixmaps, True)
-
-
-'''
-For the local version
-If running the generated exe file, must add the UI_file folder in the room folder
-'''
-
-
-# myusername = 'wang'
-# mypassword = '123456'
-
-
-# kFile = io.StringIO(k)
+LAUNCH_TIME = datetime.datetime.now()
+COL_NAMES = ['ID', 'name', 'from', 'to', 'title', 'content', 'attachment', 'star', 'time', 'readState', 'category']
+LOG_FILE_NAME = ''
+DATE_FORMAT = '%Y-%m-%d'
+LONG_TIME_FORMAT = '%H-%M-%S'
+SHORT_TIME_FORMAT = '%H:%M'
 
 
 class TaskWindow(QtWidgets.QWidget):
@@ -288,7 +269,7 @@ class TaskWindow(QtWidgets.QWidget):
     # load emails, input is the row of email
     def load_email_widget(self, email, insert_at_front=False):
         if insert_at_front:
-            current_time = datetime.datetime.now().strftime("%H:%M")
+            current_time = datetime.datetime.now().strftime(SHORT_TIME_FORMAT)
             self.current_emails.loc[self.current_emails.ID == email['ID'], 'time'] = current_time
             email['time'] = current_time
             self.log_incoming_email(email)
@@ -317,10 +298,10 @@ class TaskWindow(QtWidgets.QWidget):
         for i in random_numbers:
             time_list.append((current_day - datetime.timedelta(days=i)).strftime("%d %b"))
 
-        time_list.append((datetime.datetime.now() - datetime.timedelta(hours=4, minutes=29)).strftime("%H:%M"))
-        time_list.append((datetime.datetime.now() - datetime.timedelta(hours=3, minutes=15)).strftime("%H:%M"))
-        time_list.append((datetime.datetime.now() - datetime.timedelta(hours=2, minutes=22)).strftime("%H:%M"))
-        time_list.append((datetime.datetime.now() - datetime.timedelta(hours=0, minutes=17)).strftime("%H:%M"))
+        time_list.append((datetime.datetime.now() - datetime.timedelta(hours=4, minutes=29)).strftime(SHORT_TIME_FORMAT))
+        time_list.append((datetime.datetime.now() - datetime.timedelta(hours=3, minutes=15)).strftime(SHORT_TIME_FORMAT))
+        time_list.append((datetime.datetime.now() - datetime.timedelta(hours=2, minutes=22)).strftime(SHORT_TIME_FORMAT))
+        time_list.append((datetime.datetime.now() - datetime.timedelta(hours=0, minutes=17)).strftime(SHORT_TIME_FORMAT))
 
         for index, row in self.current_emails.iterrows():
             if time_list:
@@ -404,13 +385,13 @@ class TaskWindow(QtWidgets.QWidget):
         print('create log file')
         self.folder_path = os.path.join(self.save_location, self.username)
         Path(self.folder_path).mkdir(parents=True, exist_ok=True)
-        self.file_name = os.path.join(self.folder_path, now.strftime("%d-%m-%Y_%H-%M-%S") + '_log.csv')
+        self.file_name = os.path.join(self.folder_path, LAUNCH_TIME.strftime(f'{DATE_FORMAT}_{LONG_TIME_FORMAT}') + '_log.csv')
 
-        # self.file_name = self.folder_path + now.strftime("%d-%m-%Y_%H-%M-%S") + '_log.csv'
-        global log_file_name
-        log_file_name = self.file_name
+        # self.file_name = self.folder_path + LAUNCH_TIME.strftime(f'{DATE_FORMAT}_{LONG_TIME_FORMAT}') + '_log.csv'
+        global LOG_FILE_NAME
+        LOG_FILE_NAME = self.file_name
         print("logfile name")
-        print(log_file_name)
+        print(LOG_FILE_NAME)
         with open(self.file_name, 'w', newline='') as file:
             writer = csv.writer(file)
             writer.writerow(["time", "timestamp", "username", "ID", "email", "action", "detail", "studyCondition"])
@@ -822,9 +803,9 @@ class EmailContentPage(QWebEnginePage):
     def acceptNavigationRequest(self, url, _type, is_main_frame):
         if _type == QWebEnginePage.NavigationTypeLinkClicked:
             QtGui.QDesktopServices.openUrl(url)
-            log = pd.read_csv(log_file_name)
+            log = pd.read_csv(LOG_FILE_NAME)
             row = log.iloc[-1]
-            with open(log_file_name, 'a', newline='') as file:
+            with open(LOG_FILE_NAME, 'a', newline='') as file:
                 writer = csv.writer(file)
                 writer.writerow(
                     [datetime.datetime.now(), time.time() * 1000, row[2], row[3], row[4],
