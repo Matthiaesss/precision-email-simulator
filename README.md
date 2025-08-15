@@ -8,6 +8,12 @@ Email Research Lab is a research application that serves as a platform for condu
 - support eye-tracking technology for analysing users' eye movement and areas of interest (currently support connection to iMotion)
 - using real emails and supporting embedded URLs and PDF attachments
 
+## Commands
+
+1. py -3.10 -m venv venv
+2. .\venv\Scripts\activate
+3. pip install -r requirements.txt
+
 ## Publications
 
 Zhuo, S., Biddle, R., Betts, L., Arachchilage, N. A. G., Koh, Y. S., Russello, G., & Lottridge, D. The Impact of Workload on Phishing Susceptibility: An Experiment.
