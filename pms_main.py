@@ -13,6 +13,13 @@ from PySide6.QtUiTools import QUiLoader
 from PySide6.QtWidgets import QApplication, QFileDialog, QMessageBox
 from pynput import mouse, keyboard
 
+try:
+    import tobii_research
+    TOBII_AVAILABLE = True
+except ImportError:
+    TOBII_AVAILABLE = False
+    print("Warning: tobii-research not available. Tobii Pro Fusion support disabled.")
+
 import pms_task_window
 
 
@@ -22,6 +29,8 @@ class PrecisionEmailSimulator(QtWidgets.QWidget):
         self.ui = QUiLoader().load('resources/UI_files/welcome.ui')
         self.config = None
         self.imotion_connection = True
+        self.tobii_connection = True
+        self.tobii_eyetracker = None
         self.mouse_and_keyboard = True
 
         self.ui.startBtn.clicked.connect(self.start)
@@ -32,6 +41,13 @@ class PrecisionEmailSimulator(QtWidgets.QWidget):
         self.ui.sensorsWidget.hide()
 
         self.ui.imotionConnectBtn.clicked.connect(partial(self.start_imotion_connection, self.ui.imotionLabel))
+        
+        # Tobii Pro Fusion connection
+        if TOBII_AVAILABLE:
+            self.ui.tobiiConnectBtn.clicked.connect(partial(self.start_tobii_connection, self.ui.tobiiLabel))
+        else:
+            self.ui.tobiiConnectBtn.setEnabled(False)
+            self.ui.tobiiLabel.setText("Tobii Pro Fusion: Library not available")
 
         self.user_results_dir = ''
         # eye tracker data is collected through iMotion
@@ -156,7 +172,7 @@ class PrecisionEmailSimulator(QtWidgets.QWidget):
 
     def setup_user_results_dir(self):
         # setup csv files in user results dir
-        if self.imotion_connection:
+        if self.imotion_connection or (TOBII_AVAILABLE and self.tobii_eyetracker is not None):
             self.eye_data.to_csv(self.user_results_dir + self.start_time.strftime(f'{pms_task_window.DATE_FORMAT}_{pms_task_window.LONG_TIME_FORMAT}') + '_eye.csv', index=False)
             # self.shimmer_data.to_csv(self.user_results_dir + self.start_time.strftime(f'{pms_task_window.DATE_FORMAT}_{pms_task_window.LONG_TIME_FORMAT}') + '_shimmer.csv',
             #                         index=False)
@@ -188,7 +204,7 @@ class PrecisionEmailSimulator(QtWidgets.QWidget):
     def start_imotion_connection(self, label):
         print(label)
         background_thread = threading.Thread(target=self.imotion_connect, args=(label,))
-        background_thread.deamon = True
+        background_thread.daemon = True
         background_thread.start()
 
     def imotion_connect(self, label):
@@ -269,6 +285,131 @@ class PrecisionEmailSimulator(QtWidgets.QWidget):
                     # shimmer has 19 columns
         finally:
             sock.close()
+
+    def start_tobii_connection(self, label):
+        """Start Tobii Pro Fusion connection in a background thread"""
+        if not TOBII_AVAILABLE:
+            label.setText("Tobii Pro Fusion: Library not available")
+            return
+        
+        background_thread = threading.Thread(target=self.tobii_connect, args=(label,))
+        background_thread.daemon = True
+        background_thread.start()
+
+    def tobii_connect(self, label):
+        """Connect to Tobii Pro Fusion eye tracker"""
+        try:
+            # Find all eye trackers
+            eyetrackers = tobii_research.find_all_eyetrackers()
+            
+            if len(eyetrackers) == 0:
+                label.setText("Tobii Pro Fusion: No device found")
+                QMessageBox.warning(None, "Tobii Connection", 
+                                   "No Tobii eye tracker found. Please ensure:\n"
+                                   "1. The Tobii Pro Fusion is connected\n"
+                                   "2. Tobii Pro Eye Tracker Manager is running")
+                return
+            
+            # Use the first available eye tracker
+            self.tobii_eyetracker = eyetrackers[0]
+            device_name = self.tobii_eyetracker.device_name
+            print(f"Found Tobii eye tracker: {device_name}")
+            
+            # Update label
+            label.setText(f"Tobii Pro Fusion: {device_name} - Connected")
+            
+            # Make user results dir (if it does not exist) and set up the dir
+            self.make_user_results_dir()
+            self.setup_user_results_dir()
+            
+            # Subscribe to gaze data (calibration is done through Tobii Manager)
+            self.tobii_eyetracker.subscribe_to(tobii_research.EYETRACKER_GAZE_DATA, 
+                                               self.tobii_gaze_data_callback, 
+                                               as_dictionary=True)
+            
+            label.setText(f"Tobii Pro Fusion: {device_name} - Recording")
+            print("Tobii Pro Fusion: Subscribed to gaze data")
+            
+            # Keep connection alive
+            while self.tobii_connection and self.tobii_eyetracker is not None:
+                time.sleep(0.1)
+                
+        except Exception as e:
+            error_msg = f"Tobii connection error: {str(e)}"
+            print(error_msg)
+            label.setText("Tobii Pro Fusion: Connection error")
+            QMessageBox.critical(None, "Tobii Error", error_msg)
+            self.tobii_eyetracker = None
+
+    def tobii_gaze_data_callback(self, gaze_data):
+        """Callback function for Tobii gaze data"""
+        if not self.start_recording or self.tobii_eyetracker is None:
+            return
+        
+        try:
+            # Extract gaze data
+            left_gaze_point = gaze_data['left_gaze_point_on_display_area']
+            right_gaze_point = gaze_data['right_gaze_point_on_display_area']
+            left_pupil = gaze_data['left_pupil_diameter']
+            right_pupil = gaze_data['right_pupil_diameter']
+            left_gaze_origin = gaze_data['left_gaze_origin_in_user_coordinate_system']
+            right_gaze_origin = gaze_data['right_gaze_origin_in_user_coordinate_system']
+            left_gaze_origin_validity = gaze_data['left_gaze_origin_validity']
+            right_gaze_origin_validity = gaze_data['right_gaze_origin_validity']
+            left_gaze_point_validity = gaze_data['left_gaze_point_validity']
+            right_gaze_point_validity = gaze_data['right_gaze_point_validity']
+            system_time_stamp = gaze_data['system_time_stamp']
+            
+            # Handle invalid data (set to None/NaN if invalid)
+            GazeLeftX = left_gaze_point[0] if left_gaze_point_validity == 1 else None
+            GazeLeftY = left_gaze_point[1] if left_gaze_point_validity == 1 else None
+            GazeRightX = right_gaze_point[0] if right_gaze_point_validity == 1 else None
+            GazeRightY = right_gaze_point[1] if right_gaze_point_validity == 1 else None
+            
+            LeftPupilDiameter = left_pupil if left_gaze_point_validity == 1 else None
+            RightPupilDiameter = right_pupil if right_gaze_point_validity == 1 else None
+            
+            # Calculate eye distance (Z coordinate from gaze origin)
+            LeftEyeDistance = left_gaze_origin[2] if left_gaze_origin_validity == 1 else None
+            RightEyeDistance = right_gaze_origin[2] if right_gaze_origin_validity == 1 else None
+            
+            # Eye position (X, Y from gaze origin)
+            LeftEyePosX = left_gaze_origin[0] if left_gaze_origin_validity == 1 else None
+            LeftEyePosY = left_gaze_origin[1] if left_gaze_origin_validity == 1 else None
+            RightEyePosX = right_gaze_origin[0] if right_gaze_origin_validity == 1 else None
+            RightEyePosY = right_gaze_origin[1] if right_gaze_origin_validity == 1 else None
+            
+            # Convert system timestamp from microseconds to milliseconds
+            timestamp_device = system_time_stamp / 1000.0
+            
+            # Create data row matching the existing format
+            row_df = pd.DataFrame(
+                [[time.time() * 1000, timestamp_device, GazeLeftX, GazeLeftY, GazeRightX, GazeRightY,
+                  LeftPupilDiameter, RightPupilDiameter, LeftEyeDistance, RightEyeDistance,
+                  LeftEyePosX, LeftEyePosY, RightEyePosX, RightEyePosY]],
+                columns=self.eye_columns)
+            
+            self.eye_data = pd.concat([self.eye_data, row_df]).reset_index(drop=True)
+            
+            # Batch write to CSV (same as iMotions)
+            if self.eye_data.shape[0] > 1000:
+                self.eye_data.to_csv(
+                    self.user_results_dir + self.start_time.strftime(f'{pms_task_window.DATE_FORMAT}_{pms_task_window.LONG_TIME_FORMAT}') + '_eye.csv',
+                    mode='a',
+                    header=False, index=False)
+                self.eye_data = self.eye_data.iloc[0:0]
+                
+        except Exception as e:
+            print(f"Error processing Tobii gaze data: {str(e)}")
+
+    def __del__(self):
+        """Cleanup: Unsubscribe from Tobii if connected"""
+        if TOBII_AVAILABLE and self.tobii_eyetracker is not None:
+            try:
+                self.tobii_eyetracker.unsubscribe_from(tobii_research.EYETRACKER_GAZE_DATA, 
+                                                       self.tobii_gaze_data_callback)
+            except:
+                pass
 
 
 if __name__ == '__main__':

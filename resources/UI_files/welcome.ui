@@ -126,7 +126,31 @@
             <item>
              <widget class="QPushButton" name="imotionConnectBtn">
               <property name="text">
-               <string>Connect</string>
+               <string>Connect iMotion</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QVBoxLayout" name="Tobii">
+            <item>
+             <widget class="QLabel" name="tobiiLabel">
+              <property name="maximumSize">
+               <size>
+                <width>16777215</width>
+                <height>40</height>
+               </size>
+              </property>
+              <property name="text">
+               <string>Tobii Pro Fusion: Not Connected</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="tobiiConnectBtn">
+              <property name="text">
+               <string>Connect Tobii</string>
               </property>
              </widget>
             </item>
