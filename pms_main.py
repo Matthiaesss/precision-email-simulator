@@ -9,6 +9,7 @@ from pathlib import Path
 import pandas as pd
 import yaml
 from PySide6 import QtWidgets
+from PySide6.QtCore import Signal
 from PySide6.QtUiTools import QUiLoader
 from PySide6.QtWidgets import QApplication, QFileDialog, QMessageBox
 from pynput import mouse, keyboard
@@ -24,6 +25,10 @@ import pms_task_window
 
 
 class PrecisionEmailSimulator(QtWidgets.QWidget):
+    _tobii_status_changed = Signal(str)
+    _tobii_show_warning = Signal(str, str)
+    _tobii_show_critical = Signal(str, str)
+
     def __init__(self):
         super(PrecisionEmailSimulator, self).__init__()
         self.ui = QUiLoader().load('resources/UI_files/welcome.ui')
@@ -31,7 +36,12 @@ class PrecisionEmailSimulator(QtWidgets.QWidget):
         self.imotion_connection = True
         self.tobii_connection = True
         self.tobii_eyetracker = None
+        self.tobii_label = None
         self.mouse_and_keyboard = True
+
+        self._tobii_status_changed.connect(self._update_tobii_label)
+        self._tobii_show_warning.connect(self._show_tobii_warning)
+        self._tobii_show_critical.connect(self._show_tobii_critical)
 
         self.ui.startBtn.clicked.connect(self.start)
         self.ui.loadConfigBtn.clicked.connect(self.load_config)
@@ -74,10 +84,11 @@ class PrecisionEmailSimulator(QtWidgets.QWidget):
 
         def _on_click(x, y, button, pressed):
             if self.start_recording:
-                self.mouse_data = self.mouse_data.append(
-                    {'timestamp': time.time() * 1000, 'mouse_event': 'click', 'x': x, 'y': y, 'button': str(button),
-                     'pressed': pressed, 'scroll_x': None,
-                     'scroll_y': None}, ignore_index=True)
+                row_df = pd.DataFrame(
+                    [{'timestamp': time.time() * 1000, 'mouse_event': 'click', 'x': x, 'y': y, 'button': str(button),
+                      'pressed': pressed, 'scroll_x': None, 'scroll_y': None}],
+                    columns=self.mouse_columns)
+                self.mouse_data = pd.concat([self.mouse_data, row_df]).reset_index(drop=True)
 
                 if self.mouse_data.shape[0] > 20:
                     print(self.user_results_dir)
@@ -89,10 +100,11 @@ class PrecisionEmailSimulator(QtWidgets.QWidget):
 
         def _on_scroll(x, y, dx, dy):
             if self.start_recording:
-                self.mouse_data = self.mouse_data.append(
-                    {'timestamp': time.time() * 1000, 'mouse_event': 'scroll', 'x': x, 'y': y, 'button': None,
-                     'pressed': None, 'scroll_x': dx,
-                     'scroll_y': dy}, ignore_index=True)
+                row_df = pd.DataFrame(
+                    [{'timestamp': time.time() * 1000, 'mouse_event': 'scroll', 'x': x, 'y': y, 'button': None,
+                      'pressed': None, 'scroll_x': dx, 'scroll_y': dy}],
+                    columns=self.mouse_columns)
+                self.mouse_data = pd.concat([self.mouse_data, row_df]).reset_index(drop=True)
                 if self.mouse_data.shape[0] > 20:
                     self.mouse_data.to_csv(
                         self.user_results_dir + self.start_time.strftime(f'{pms_task_window.DATE_FORMAT}_{pms_task_window.LONG_TIME_FORMAT}') + '_mouse.csv',
@@ -104,10 +116,12 @@ class PrecisionEmailSimulator(QtWidgets.QWidget):
             if self.start_recording:
                 try:
                     # Handle character keys
-                    self.keyboard_data = self.keyboard_data.append({'timestamp': time.time() * 1000, 'keys': str(key.char)}, ignore_index=True)
+                    row_df = pd.DataFrame([{'timestamp': time.time() * 1000, 'keys': str(key.char)}], columns=self.keyboard_columns)
+                    self.keyboard_data = pd.concat([self.keyboard_data, row_df]).reset_index(drop=True)
                 except AttributeError:
                     # Handle special keys (e.g., ctrl, alt, etc.)
-                    self.keyboard_data = self.keyboard_data.append({'timestamp': time.time() * 1000, 'keys': str(key)}, ignore_index=True)
+                    row_df = pd.DataFrame([{'timestamp': time.time() * 1000, 'keys': str(key)}], columns=self.keyboard_columns)
+                    self.keyboard_data = pd.concat([self.keyboard_data, row_df]).reset_index(drop=True)
 
                 if self.keyboard_data.shape[0] > 20:
                     print(self.user_results_dir)
@@ -286,59 +300,70 @@ class PrecisionEmailSimulator(QtWidgets.QWidget):
         finally:
             sock.close()
 
+    def _update_tobii_label(self, text):
+        if self.tobii_label is not None:
+            self.tobii_label.setText(text)
+
+    def _show_tobii_warning(self, title, message):
+        QMessageBox.warning(self.ui, title, message)
+
+    def _show_tobii_critical(self, title, message):
+        QMessageBox.critical(self.ui, title, message)
+
     def start_tobii_connection(self, label):
         """Start Tobii Pro Fusion connection in a background thread"""
         if not TOBII_AVAILABLE:
             label.setText("Tobii Pro Fusion: Library not available")
             return
-        
-        background_thread = threading.Thread(target=self.tobii_connect, args=(label,))
+
+        self.tobii_label = label
+        background_thread = threading.Thread(target=self.tobii_connect)
         background_thread.daemon = True
         background_thread.start()
 
-    def tobii_connect(self, label):
+    def tobii_connect(self):
         """Connect to Tobii Pro Fusion eye tracker"""
         try:
             # Find all eye trackers
             eyetrackers = tobii_research.find_all_eyetrackers()
-            
+
             if len(eyetrackers) == 0:
-                label.setText("Tobii Pro Fusion: No device found")
-                QMessageBox.warning(None, "Tobii Connection", 
-                                   "No Tobii eye tracker found. Please ensure:\n"
-                                   "1. The Tobii Pro Fusion is connected\n"
-                                   "2. Tobii Pro Eye Tracker Manager is running")
+                self._tobii_status_changed.emit("Tobii Pro Fusion: No device found")
+                self._tobii_show_warning.emit(
+                    "Tobii Connection",
+                    "No Tobii eye tracker found. Please ensure:\n"
+                    "1. The Tobii Pro Fusion is connected\n"
+                    "2. Tobii Pro Eye Tracker Manager is running")
                 return
-            
+
             # Use the first available eye tracker
             self.tobii_eyetracker = eyetrackers[0]
             device_name = self.tobii_eyetracker.device_name
             print(f"Found Tobii eye tracker: {device_name}")
-            
-            # Update label
-            label.setText(f"Tobii Pro Fusion: {device_name} - Connected")
-            
+
+            self._tobii_status_changed.emit(f"Tobii Pro Fusion: {device_name} - Connected")
+
             # Make user results dir (if it does not exist) and set up the dir
             self.make_user_results_dir()
             self.setup_user_results_dir()
-            
+
             # Subscribe to gaze data (calibration is done through Tobii Manager)
-            self.tobii_eyetracker.subscribe_to(tobii_research.EYETRACKER_GAZE_DATA, 
-                                               self.tobii_gaze_data_callback, 
+            self.tobii_eyetracker.subscribe_to(tobii_research.EYETRACKER_GAZE_DATA,
+                                               self.tobii_gaze_data_callback,
                                                as_dictionary=True)
-            
-            label.setText(f"Tobii Pro Fusion: {device_name} - Recording")
+
+            self._tobii_status_changed.emit(f"Tobii Pro Fusion: {device_name} - Recording")
             print("Tobii Pro Fusion: Subscribed to gaze data")
-            
+
             # Keep connection alive
             while self.tobii_connection and self.tobii_eyetracker is not None:
                 time.sleep(0.1)
-                
+
         except Exception as e:
             error_msg = f"Tobii connection error: {str(e)}"
             print(error_msg)
-            label.setText("Tobii Pro Fusion: Connection error")
-            QMessageBox.critical(None, "Tobii Error", error_msg)
+            self._tobii_status_changed.emit("Tobii Pro Fusion: Connection error")
+            self._tobii_show_critical.emit("Tobii Error", error_msg)
             self.tobii_eyetracker = None
 
     def tobii_gaze_data_callback(self, gaze_data):
