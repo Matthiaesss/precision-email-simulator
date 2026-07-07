@@ -194,14 +194,14 @@ class TaskWindow(QtWidgets.QWidget):
     def setup_emails(self, session_config):
         self.current_emails = self.emails[
             (self.emails['ID'] >= int(session_config.get('legitEmails').get('emailListRange').get('start'))) &
-            (self.emails['ID'] <= int(session_config.get('legitEmails').get('emailListRange').get('finish')))]
+            (self.emails['ID'] <= int(session_config.get('legitEmails').get('emailListRange').get('finish')))].copy()
         if session_config.get('legitEmails').get('shuffleEmails'):
             self.current_emails = self.current_emails.sample(frac=1).reset_index(drop=True)
 
         if session_config.get('incomingEmails'):
             self.incoming_emails = self.emails[
                 (self.emails['ID'] >= int(session_config.get('legitEmails').get('incomingRange').get('start'))) &
-                (self.emails['ID'] <= int(session_config.get('legitEmails').get('incomingRange').get('finish')))]
+                (self.emails['ID'] <= int(session_config.get('legitEmails').get('incomingRange').get('finish')))].copy()
             if session_config.get('legitEmails').get('shuffleEmails'):
                 self.incoming_emails = self.incoming_emails.sample(frac=1).reset_index(drop=True)
 
@@ -259,7 +259,8 @@ class TaskWindow(QtWidgets.QWidget):
         print('----------------- email add notification --------------------------')
         if email_list.shape[0] > 0:
             item = email_list.iloc[0]
-            self.current_emails = self.current_emails.append(item, ignore_index=True)
+            row_df = pd.DataFrame([item])
+            self.current_emails = pd.concat([self.current_emails, row_df]).reset_index(drop=True)
             self.load_email_widget(item, True)
             email_list = email_list.iloc[1:, :]
             if sys.platform != 'darwin':
@@ -271,6 +272,7 @@ class TaskWindow(QtWidgets.QWidget):
         if insert_at_front:
             current_time = datetime.datetime.now().strftime(SHORT_TIME_FORMAT)
             self.current_emails.loc[self.current_emails.ID == email['ID'], 'time'] = current_time
+            email = email.copy()
             email['time'] = current_time
             self.log_incoming_email(email)
             self.set_unread_email_count()
