@@ -1,4 +1,5 @@
 import datetime
+import os
 import socket
 import sys
 import threading
@@ -13,6 +14,9 @@ from PySide6.QtCore import Signal
 from PySide6.QtUiTools import QUiLoader
 from PySide6.QtWidgets import QApplication, QFileDialog, QMessageBox
 from pynput import mouse, keyboard
+
+APP_ROOT = Path(__file__).resolve().parent
+os.chdir(APP_ROOT)
 
 try:
     import tobii_research
@@ -31,7 +35,7 @@ class PrecisionEmailSimulator(QtWidgets.QWidget):
 
     def __init__(self):
         super(PrecisionEmailSimulator, self).__init__()
-        self.ui = QUiLoader().load('resources/UI_files/welcome.ui')
+        self.ui = QUiLoader().load(str(APP_ROOT / 'resources/UI_files/welcome.ui'))
         self.config = None
         self.imotion_connection = True
         self.tobii_connection = True
@@ -163,8 +167,9 @@ class PrecisionEmailSimulator(QtWidgets.QWidget):
 
         study = pms_task_window.TaskWindow(self.ui.usernameBox.text(), self.config)
 
+        study.ui.setMinimumSize(1100, 750)
         study.ui.show()
-        study.activateWindow()
+        study.ui.activateWindow()
         self.ui.close()
 
         # self.login_ui = QUiLoader().load('resources/UI_files/login.ui')
