@@ -1,10 +1,10 @@
-emailListLocation: testCSV.csv
+emailListLocation: workload_high.csv
 emailResourceLocation: emails_example
 saveLocation: results
 sessions:
   session1:
-    name: session1
-    duration: '15'
+    name: high_workload
+    duration: '10'
     audioNotification: '1'
     timeCountDown: true
     hasPhishEmails: true
@@ -19,17 +19,17 @@ sessions:
     legitEmails:
       emailListRange:
         start: '101'
-        finish: '116'
-      shuffleEmails: false
+        finish: '119'
+      shuffleEmails: true
       incomingRange:
         start: ''
         finish: ''
     phishEmails:
-      emailList: 1,2,3,4,5,6
-      randomLoc: false
-      emailListLocations: 3,4,8,15,17,19
+      emailList: 1,2,3
+      randomLoc: true
+      emailListLocations: ''
       shuffleEmails: false
-      emailListNum: '6'
+      emailListNum: '3'
       incomingList: ''
       incomingLocations: ''
       incomingNum: '0'

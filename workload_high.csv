@@ -15,9 +15,9 @@ ID,name,from,to,title,content,attachment,star,time,readState,category,LinkOfInte
 114,Test user 14,test@test.com,me,Email title 14,Test_Email.html,None,FALSE,18-Sep,FALSE,InRel,0
 115,Test user 15,test@test.com,me,Email title 15,Test_Email.html,None,FALSE,18-Sep,FALSE,InRel,0
 116,Test user 16,test@test.com,me,Email title 16,Test_Email.html,None,FALSE,18-Sep,FALSE,ExNone,5
+117,Test user 17,test@test.com,me,Email title 17,Test_Email.html,None,FALSE,18-Sep,FALSE,InNone,5
+118,Test user 18,test@test.com,me,Email title 18,Test_Email.html,None,FALSE,17-Sep,FALSE,Task,0
+119,Test user 19,test@test.com,me,Email title 19,Test_Email.html,None,FALSE,17-Sep,FALSE,InRel,0
 1,Phish1,phish@phishing.com,me,Phish Title 1,Test_Email.html,None,FALSE,19-Sep,FALSE,phish,1
 2,Phish2,phish@phishing.com,me,Phish Title 2,Test_Email.html,P_test.pdf,FALSE,20-Sep,FALSE,phish,2
 3,Phish3,phish@phishing.com,me,Phish Title 3,Test_Email.html,None,FALSE,21-Sep,FALSE,phish,3
-4,Phish4,phish@phishing.com,me,Phish Title 4,Test_Email.html,None,FALSE,22-Sep,FALSE,phish,4
-5,Phish5,phish@phishing.com,me,Phish Title 5,Test_Email.html,None,FALSE,23-Sep,FALSE,phish,5
-6,Phish6,phish@phishing.com,me,Phish Title 6,Test_Email.html,None,FALSE,24-Sep,FALSE,phish,6
