@@ -1,14 +1,14 @@
-emailListLocation: testCSV.csv
+emailListLocation: workload_low.csv
 emailResourceLocation: emails_example
 saveLocation: results
 sessions:
   session1:
-    name: session1
-    duration: '15'
+    name: low_workload
+    duration: '10'
     audioNotification: '1'
     timeCountDown: true
     hasPhishEmails: true
-    incomingEmails: true
+    incomingEmails: false
     incomingInterval: '0.1'
     primaryTaskHtml: test.html
     endSessionPopup: done!
@@ -19,17 +19,17 @@ sessions:
     legitEmails:
       emailListRange:
         start: '101'
-        finish: '110'
+        finish: '113'
       shuffleEmails: true
       incomingRange:
-        start: '111'
-        finish: '120'
+        start: ''
+        finish: ''
     phishEmails:
-      emailList: 1,2,3,4
-      randomLoc: false
-      emailListLocations: 2,4,6
-      shuffleEmails: true
-      emailListNum: '3'
-      incomingList: 5,6
-      incomingLocations: 1,2
-      incomingNum: '2'
+      emailList: 1,2
+      randomLoc: true
+      emailListLocations: ''
+      shuffleEmails: false
+      emailListNum: '2'
+      incomingList: ''
+      incomingLocations: ''
+      incomingNum: '0'
