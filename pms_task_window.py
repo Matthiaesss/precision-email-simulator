@@ -19,6 +19,7 @@ from plyer import notification
 from pygame import mixer
 
 LAUNCH_TIME = datetime.datetime.now()
+APP_ROOT = Path(__file__).resolve().parent
 COL_NAMES = ['ID', 'name', 'from', 'to', 'title', 'content', 'attachment', 'star', 'time', 'readState', 'category']
 LOG_FILE_NAME = ''
 DATE_FORMAT = '%Y-%m-%d'
@@ -43,11 +44,12 @@ class TaskWindow(QtWidgets.QWidget):
         self.config = config
         self.save_location = self.config.get('saveLocation')
 
-        self.ui = QUiLoader().load('resources/UI_files/main_page.ui')
+        self.ui = QUiLoader().load(str(APP_ROOT / 'resources/UI_files/main_page.ui'))
 
         if self.username == '':
             self.username = 'no_user_name'
-        self.emails = pd.read_csv(self.config.get('emailListLocation'))
+        email_list_path = APP_ROOT / self.config.get('emailListLocation')
+        self.emails = pd.read_csv(email_list_path)
         self.emails['star'] = self.emails['star'].astype('bool')
 
         self.current_emails = pd.DataFrame()
@@ -283,34 +285,16 @@ class TaskWindow(QtWidgets.QWidget):
         self.ui.emailList.insertRow(row_pos)
         cell1 = str(email['name']) + '<br>' + str(email['title'])
         self.set_cell(self.ui.emailList, row_pos, 0, cell1, QtGui.QFont("Calibri", 12, QtGui.QFont.Bold))
+        self.ui.emailList.item(row_pos, 0).setData(QtCore.Qt.UserRole, int(email['ID']))
         self.set_cell(self.ui.emailList, row_pos, 1, str(email['time']), QtGui.QFont("Calibri", 10, QtGui.QFont.Bold))
         self.ui.emailList.item(row_pos, 1).setTextAlignment(Qt.AlignHCenter)
+        self.ui.emailList.item(row_pos, 1).setForeground(QtGui.QColor(0, 0, 0))
         self.ui.emailList.setRowHeight(row_pos, 65)
         self.change_row_background(row_pos, QtGui.QColor(245, 250, 255))
 
     def set_up_email_timestamp(self):
-        random_numbers = [random.randint(1, 10) for _ in range(self.current_emails.shape[0] - 4)]
-
-        # list sorted down from 10 to 1
-        random_numbers.sort(reverse=True)
-        current_day = datetime.date.today()
-        time_list = []
-
-        # set up the list of times for the emails (from oldest to newest)
-        for i in random_numbers:
-            time_list.append((current_day - datetime.timedelta(days=i)).strftime("%d %b"))
-
-        time_list.append((datetime.datetime.now() - datetime.timedelta(hours=4, minutes=29)).strftime(SHORT_TIME_FORMAT))
-        time_list.append((datetime.datetime.now() - datetime.timedelta(hours=3, minutes=15)).strftime(SHORT_TIME_FORMAT))
-        time_list.append((datetime.datetime.now() - datetime.timedelta(hours=2, minutes=22)).strftime(SHORT_TIME_FORMAT))
-        time_list.append((datetime.datetime.now() - datetime.timedelta(hours=0, minutes=17)).strftime(SHORT_TIME_FORMAT))
-
-        for index, row in self.current_emails.iterrows():
-            if time_list:
-                self.current_emails.at[index, 'time'] = time_list.pop()
-            else:
-                self.current_emails.at[index, 'time'] = "-1"
-            # del time_list[-1] #
+        # Use the time/date values from the workload CSV as-is.
+        self.current_emails['time'] = self.current_emails['time'].astype(str)
 
     def change_row_background(self, row, colour):
         self.ui.emailList.item(row, 0).setBackground(colour)
@@ -318,10 +302,28 @@ class TaskWindow(QtWidgets.QWidget):
 
     def get_current_email(self):
         current_row = self.ui.emailList.currentRow()
-        email = self.ui.emailList.item(current_row, 0).text()
-        subject_line = email.split('<br>')[1]
+        if current_row < 0 or self.current_emails.empty:
+            return self.current_emails.iloc[0]
 
-        return self.current_emails.loc[self.current_emails['title'] == subject_line].iloc[0]
+        item = self.ui.emailList.item(current_row, 0)
+        if item is not None:
+            email_id = item.data(QtCore.Qt.UserRole)
+            if email_id is not None:
+                matches = self.current_emails.loc[self.current_emails['ID'] == email_id]
+                if not matches.empty:
+                    return matches.iloc[0]
+
+        if current_row < len(self.current_emails):
+            return self.current_emails.iloc[current_row]
+
+        email_text = item.text() if item is not None else ''
+        if '<br>' in email_text:
+            subject_line = email_text.split('<br>', 1)[1]
+            matches = self.current_emails.loc[self.current_emails['title'] == subject_line]
+            if not matches.empty:
+                return matches.iloc[0]
+
+        return self.current_emails.iloc[0]
 
     # ========================== sections ================================================
 
@@ -350,7 +352,7 @@ class TaskWindow(QtWidgets.QWidget):
 
         self.primary_task.page().setWebChannel(self.channel)
 
-        path = f"{os.getcwd()}/{self.get_current_session().get('primaryTaskHtml')}"
+        path = str(APP_ROOT / self.get_current_session().get('primaryTaskHtml'))
         self.primary_task.setUrl(QtCore.QUrl.fromLocalFile(path))
 
         self.ui.primaryTaskL.addWidget(self.primary_task)
@@ -422,8 +424,7 @@ class TaskWindow(QtWidgets.QWidget):
 
         self.ui.emailList.setHorizontalHeaderLabels(['Email', 'Time'])
         header = self.ui.emailList.horizontalHeader()
-        # self.ui.emailList.setColumnWidth(0, 70)
-        self.ui.emailList.setColumnWidth(1, 50)
+        self.ui.emailList.setColumnWidth(1, 100)
 
         self.ui.emailList.setItemDelegateForColumn(0, ListDelegate())
 
@@ -616,9 +617,9 @@ class TaskWindow(QtWidgets.QWidget):
         # set the content
         clear_layout(self.ui.contentL)
         web_engine_view = HtmlView(self)
-        path = f"{os.getcwd()}/{self.config.get('emailResourceLocation')}/html/{item['content']}"
+        path = str(APP_ROOT / self.config.get('emailResourceLocation') / 'html' / item['content'])
         print(path)
-        web_engine_view.load(QtCore.QUrl().fromLocalFile(path))
+        web_engine_view.load(QtCore.QUrl.fromLocalFile(path))
         web_engine_view.resize(self.ui.contentW.width(), self.ui.contentW.height())
         self.ui.contentL.addWidget(web_engine_view)
         web_engine_view.page().linkHovered.connect(self.link_hovered)
@@ -695,9 +696,10 @@ class TaskWindow(QtWidgets.QWidget):
                 self.get_current_session().get('cssStyles').get(category).get('senderIcon'))
 
     def reset_css(self):
-        self.ui.emailSubjectLine.setStyleSheet('')
+        self.ui.emailSubjectLine.setStyleSheet('color: rgb(0, 0, 0);')
         self.ui.subjectIcon.hide()
-        self.ui.fromAddress.setStyleSheet('')
+        self.ui.fromAddress.setStyleSheet('color: rgb(0, 0, 0);')
+        self.ui.toAddress.setStyleSheet('color: rgb(80, 80, 80);')
         self.ui.userIcon.setStyleSheet(
             'border:None; border-image: url(resources/sender.png) 0 0 0 0 stretch stretch;')
         self.ui.contentW.setStyleSheet('')
@@ -708,7 +710,7 @@ class TaskWindow(QtWidgets.QWidget):
     def create_attachment_btn(self, name):
         btn = QtWidgets.QPushButton(name)
         icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap(os.path.abspath(os.getcwd()) + r'/resources/attachment.png'))
+        icon.addPixmap(QtGui.QPixmap(str(APP_ROOT / 'resources/attachment.png')))
         btn.setIcon(icon)
         btn.setStyleSheet(
             "border: 1px solid rgb(150, 150, 150); border-radius:2px; background:#56d5f9; margin: 10px; font-size: 18px; padding: 5px;")
@@ -716,7 +718,7 @@ class TaskWindow(QtWidgets.QWidget):
         return btn
 
     def open_attachment(self, name):
-        attachment_root = f"{os.getcwd()}/{self.config.get('emailResourceLocation')}/Attachments"
+        attachment_root = str(APP_ROOT / self.config.get('emailResourceLocation') / 'Attachments')
         webbrowser.open(attachment_root + '/' + name)
         self.log_email("open attachment", "legit attachment: " + name)
 
@@ -724,7 +726,7 @@ class TaskWindow(QtWidgets.QWidget):
     def create_phish_attachment_btn(self, name):
         btn = QtWidgets.QPushButton(name)
         icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap(os.path.abspath(os.getcwd()) + r'/resources/attachment.png'))
+        icon.addPixmap(QtGui.QPixmap(str(APP_ROOT / 'resources/attachment.png')))
         btn.setIcon(icon)
         btn.setStyleSheet(
             "border: 1px solid rgb(150, 150, 150); border-radius:2px; background:#56d5f9; margin: 10px; font-size: 18px; padding: 5px;")
@@ -845,14 +847,17 @@ class ListDelegate(QtWidgets.QStyledItemDelegate):
         self.initStyleOption(opt, index)
 
         painter.save()
-        doc = QTextDocument()
-        doc.setHtml(opt.text)
-        doc.setDefaultFont(opt.font)
-        opt.text = ""
         style = opt.widget.style()
         style.drawControl(QStyle.CE_ItemViewItem, opt, painter)
-        painter.translate(opt.rect.left(), opt.rect.top())
-        clip = QRectF(0, 0, opt.rect.width(), opt.rect.height())
+
+        text = opt.text.replace('\n', '<br>')
+        doc = QTextDocument()
+        doc.setDefaultFont(opt.font)
+        doc.setHtml(
+            f'<div style="color: rgb(0, 0, 0); background: transparent;">{text}</div>'
+        )
+        painter.translate(opt.rect.left() + 4, opt.rect.top() + 2)
+        clip = QRectF(0, 0, max(0, opt.rect.width() - 8), opt.rect.height() - 4)
         doc.drawContents(painter, clip)
         painter.restore()
 
@@ -860,6 +865,7 @@ class ListDelegate(QtWidgets.QStyledItemDelegate):
         opt = QStyleOptionViewItem(option)
         self.initStyleOption(opt, index)
         doc = QTextDocument()
-        doc.setHtml(opt.text)
-        doc.setTextWidth(opt.rect.width())
-        return QSize(doc.idealWidth(), int(doc.size().height()))
+        doc.setDefaultFont(opt.font)
+        doc.setHtml(f'<div style="color: rgb(0, 0, 0);">{opt.text.replace(chr(10), "<br>")}</div>')
+        doc.setTextWidth(max(opt.rect.width(), 200))
+        return QSize(int(doc.idealWidth()), max(65, int(doc.size().height()) + 8))
