@@ -1,9 +1,9 @@
 ID,name,from,to,title,content,attachment,star,time,readState,category,LinkOfInterests
-101,James Patel,j.patel@department.ac.nz,me,Weekly Department Meeting Details,low/101.html,Meeting_Agenda.pdf,FALSE,06-July,FALSE,InNone,1
+101,James Patel,j.patel@department.ac.nz,me,Weekly Department Meeting Details,low/101.html,Meeting_Agenda.pdf,FALSE,06-July,FALSE,ExNone,1
 102,Facilities Department,facilities@department.ac.nz,me,Room Booking Confirmed,low/102.html,None,FALSE,06-July,FALSE,InNone,0
 103,Facilities Department,facilities@department.ac.nz,me,Printer Maintenance Complete,low/103.html,None,FALSE,08-July,FALSE,InNone,0
-104,Test user 4,test@test.com,me,Email title 4,Test_Email.html,None,FALSE,25-Sep,FALSE,ExNone,2
-105,Test user 5,test@test.com,me,Email title 5,Test_Email.html,None,FALSE,27-Sep,FALSE,InRel,1
+104,Communications,communications@department.ac.nz,me,Faculty Newsletter,low/104.html,None,FALSE,06-July,FALSE,InRel,0
+105,Reception,reception@department.ac.nz,me,Updated Visitor Parking Information,low/105.html,None,FALSE,06-July,FALSE,InRel,0
 106,Test user 6,test@test.com,me,Email title 6,Test_Email.html,None,FALSE,25-Sep,FALSE,InNone,7
 107,Test user 7,test@test.com,me,Email title 7,Test_Email.html,None,FALSE,25-Sep,FALSE,Task,0
 108,Test user 8,test@test.com,me,Email title 8,Test_Email.html,None,FALSE,23-Sep,FALSE,ExNone,2
