@@ -650,7 +650,8 @@ class TaskWindow(QtWidgets.QWidget):
 
             if self.hovered_url != "":
                 self.log_email("url hovered", link)
-                self.ui.URLDisplay.setHidden(False)
+                # self.ui.URLDisplay.setHidden(False)
+                self.ui.URLDisplay.setHidden(True)
                 # if link == "https://iam.auckland.ac.nz/profile/SAML2/Redirect/SSO?execution=e1s1":
                 #     link = "https://docs.google.com/spreadsheets/d/1I32l2q-FAGXPPx32jT2HkrtD8yxNOU7KGrDNHb5-dxM/edit?usp=sharing"
                 self.ui.URLDisplay.setText(link)

@@ -18,14 +18,14 @@ sessions:
     unreadBtn: false
     legitEmails:
       emailListRange:
-        start: '101'
-        finish: '119'
+        start: '201'
+        finish: '217'
       shuffleEmails: true
       incomingRange:
         start: ''
         finish: ''
     phishEmails:
-      emailList: 1,2,3
+      emailList: 3,4,5
       randomLoc: true
       emailListLocations: ''
       shuffleEmails: false

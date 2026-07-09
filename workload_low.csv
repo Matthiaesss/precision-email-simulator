@@ -1,19 +1,16 @@
 ID,name,from,to,title,content,attachment,star,time,readState,category,LinkOfInterests
-101,James Patel,j.patel@department.ac.nz,me,Weekly Department Meeting Details,low/101.html,Meeting_Agenda.pdf,FALSE,06-July,FALSE,ExNone,1
+101,James Patel,j.patel@department.ac.nz,all,Weekly Department Meeting Details,low/101.html,Meeting_Agenda.pdf,FALSE,06-July,FALSE,InNone,1
 102,Facilities Department,facilities@department.ac.nz,me,Room Booking Confirmed,low/102.html,None,FALSE,06-July,FALSE,InNone,0
-103,Facilities Department,facilities@department.ac.nz,me,Printer Maintenance Complete,low/103.html,None,FALSE,08-July,FALSE,InNone,0
-104,Communications,communications@department.ac.nz,me,Faculty Newsletter,low/104.html,None,FALSE,06-July,FALSE,InRel,0
-105,Reception,reception@department.ac.nz,me,Updated Visitor Parking Information,low/105.html,None,FALSE,06-July,FALSE,InRel,0
-106,Test user 6,test@test.com,me,Email title 6,Test_Email.html,None,FALSE,25-Sep,FALSE,InNone,7
-107,Test user 7,test@test.com,me,Email title 7,Test_Email.html,None,FALSE,25-Sep,FALSE,Task,0
-108,Test user 8,test@test.com,me,Email title 8,Test_Email.html,None,FALSE,23-Sep,FALSE,ExNone,2
-109,Test user 9,test@test.com,me,Email title 9,Test_Email.html,None,FALSE,23-Sep,FALSE,InRel,0
-110,Test user 10,test@test.com,me,Email title 10,Test_Email.html,None,FALSE,23-Sep,FALSE,InNone,5
-111,Test user 11,test@test.com,me,Email title 11,Test_Email.html,None,FALSE,21-Sep,FALSE,InNone,5
-112,Test user 12,test@test.com,me,Email title 12,Test_Email.html,None,FALSE,20-Sep,FALSE,Task,0
-113,Test user 13,test@test.com,me,Email title 13,Test_Email.html,None,FALSE,20-Sep,FALSE,Task,0
-114,Test user 14,test@test.com,me,Email title 14,Test_Email.html,None,FALSE,18-Sep,FALSE,InRel,0
-115,Test user 15,test@test.com,me,Email title 15,Test_Email.html,None,FALSE,18-Sep,FALSE,InRel,0
-116,Test user 16,test@test.com,me,Email title 16,Test_Email.html,None,FALSE,18-Sep,FALSE,ExNone,5
-1,Phish1,phish@phishing.com,me,Phish Title 1,Test_Email.html,None,FALSE,19-Sep,FALSE,phish,1
-2,Phish2,phish@phishing.com,me,Phish Title 2,Test_Email.html,P_test.pdf,FALSE,20-Sep,FALSE,phish,2
+103,Facilities Department,facilities@department.ac.nz,me,Printer Maintenance Complete,low/103.html,None,FALSE,08-July,FALSE,ExNone,0
+104,Communications,communications@department.ac.nz,all,Faculty Newsletter,low/104.html,None,FALSE,06-July,FALSE,ExNone,0
+105,Reception,reception@department.ac.nz,all,Updated Visitor Parking Information,low/105.html,None,FALSE,06-July,FALSE,ExNone,0
+106,Jess Stark,j.stark@department.ac.nz,all,Reminder: Department Social Event Tonight,low/106.html,None,FALSE,10-July,FALSE,InNone,0
+107,Fred Michaels,f.michaels@department.ac.nz,me,Computer Stopped Working,low/107.html,None,FALSE,09-July,FALSE,InRel,0
+108,Evan Clark,e.clark@department.ac.nz,me,Equipment Delivery Expected,low/108.html,None,FALSE,08-July,FALSE,InRel,0
+109,Jane Williams,j.williams@department.ac.nz,me,Seminar RSVP Reminder,low/109.html,None,FALSE,09-July,FALSE,InRel,0
+110,Adobe,noreply@adobe.com,me,Software Subscription Renewed,low/110.html,None,FALSE,06-July,FALSE,Task,0
+111,Sarah Wilson,s.wilson@department.ac.nz,me,Stationery Order Confirmation,low/111.html,None,FALSE,08-July,FALSE,Task,0
+112,Lily Smith,l.smith@department.ac.nz,me,Guest Speaker Event Catering,low/112.html,CateringInvoice.pdf,FALSE,06-July,FALSE,Task,1
+113,IT Department,it@department.ac.nz,me,Monitor Purchase,low/113.html,None,FALSE,08-July,FALSE,Task,0
+1,NZ Post,notifications@nzpost-deliveries.com,me,Package Delivery Requires Confirmation,low/1.html,None,FALSE,06-July,FALSE,phish,1
+2,George Taylor,eemdfffs2053kks@outlook.com,me,Document Shared With You,low/2.html,Form.pdf,FALSE,07-July,FALSE,phish,1
