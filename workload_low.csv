@@ -1,16 +1,16 @@
 ID,name,from,to,title,content,attachment,star,time,readState,category,LinkOfInterests
-101,James Patel,j.patel@department.ac.nz,all,Weekly Department Meeting Details,low/101.html,Meeting_Agenda.pdf,FALSE,06-July,FALSE,InNone,1
-102,Facilities Department,facilities@department.ac.nz,me,Room Booking Confirmed,low/102.html,None,FALSE,06-July,FALSE,InNone,0
-103,Facilities Department,facilities@department.ac.nz,me,Printer Maintenance Complete,low/103.html,None,FALSE,08-July,FALSE,ExNone,0
-104,Communications,communications@department.ac.nz,all,Faculty Newsletter,low/104.html,None,FALSE,06-July,FALSE,ExNone,0
-105,Reception,reception@department.ac.nz,all,Updated Visitor Parking Information,low/105.html,None,FALSE,06-July,FALSE,ExNone,0
-106,Jess Stark,j.stark@department.ac.nz,all,Reminder: Department Social Event Tonight,low/106.html,None,FALSE,10-July,FALSE,InNone,0
-107,Fred Michaels,f.michaels@department.ac.nz,me,Computer Stopped Working,low/107.html,None,FALSE,09-July,FALSE,InRel,0
-108,Evan Clark,e.clark@department.ac.nz,me,Equipment Delivery Expected,low/108.html,None,FALSE,08-July,FALSE,InRel,0
-109,Jane Williams,j.williams@department.ac.nz,me,Seminar RSVP Reminder,low/109.html,None,FALSE,09-July,FALSE,InRel,0
-110,Adobe,noreply@adobe.com,me,Software Subscription Renewed,low/110.html,None,FALSE,06-July,FALSE,Task,0
-111,Sarah Wilson,s.wilson@department.ac.nz,me,Stationery Order Confirmation,low/111.html,None,FALSE,08-July,FALSE,Task,0
-112,Lily Smith,l.smith@department.ac.nz,me,Guest Speaker Event Catering,low/112.html,CateringInvoice.pdf,FALSE,06-July,FALSE,Task,1
-113,IT Department,it@department.ac.nz,me,Monitor Purchase,low/113.html,None,FALSE,08-July,FALSE,Task,0
-1,NZ Post,notifications@nzpost-deliveries.com,me,Package Delivery Requires Confirmation,low/1.html,None,FALSE,06-July,FALSE,phish,1
-2,George Taylor,eemdfffs2053kks@outlook.com,me,Document Shared With You,low/2.html,Form.pdf,FALSE,07-July,FALSE,phish,1
+101,James Patel,j.patel@department.ac.nz,all,Weekly department meeting details,low/101.html,Meeting_Agenda.pdf,FALSE,06-July,FALSE,InNone,1
+102,Facilities Department,facilities@department.ac.nz,me,Room booking confirmed,low/102.html,None,FALSE,06-July,FALSE,InNone,0
+103,Facilities Department,facilities@department.ac.nz,me,Printer maintenance complete,low/103.html,None,FALSE,08-July,FALSE,ExNone,0
+104,Communications,communications@department.ac.nz,all,Faculty newsletter,low/104.html,None,FALSE,06-July,FALSE,ExNone,0
+105,Reception,reception@department.ac.nz,all,Updated visitor parking Information,low/105.html,None,FALSE,06-July,FALSE,ExNone,0
+106,Jess Stark,j.stark@department.ac.nz,all,Reminder: department social event tonight,low/106.html,None,FALSE,10-July,FALSE,InNone,0
+107,Fred Michaels,f.michaels@department.ac.nz,me,Computer stopped working,low/107.html,None,FALSE,09-July,FALSE,InRel,0
+108,Evan Clark,e.clark@department.ac.nz,me,Equipment delivery expected,low/108.html,None,FALSE,08-July,FALSE,InRel,0
+109,Jane Williams,j.williams@department.ac.nz,me,Seminar RSVP reminder,low/109.html,None,FALSE,09-July,FALSE,InRel,0
+110,Adobe,noreply@adobe.com,me,Software Subscription renewed,low/110.html,None,FALSE,06-July,FALSE,Task,0
+111,Sarah Wilson,s.wilson@department.ac.nz,me,Stationery order confirmation,low/111.html,None,FALSE,08-July,FALSE,Task,0
+112,Lily Smith,l.smith@department.ac.nz,me,Guest speaker event catering,low/112.html,CateringInvoice.pdf,FALSE,06-July,FALSE,Task,1
+113,IT Department,it@department.ac.nz,me,Monitor purchase,low/113.html,None,FALSE,08-July,FALSE,Task,0
+1,NZ Post,notifications@nzpost-deliveries.com,me,Package delivery requires confirmation,low/1.html,None,FALSE,06-July,FALSE,phish,1
+2,George Taylor,george.taylor.documents@outlook.com,me,Document shared with you,low/2.html,Form.pdf,FALSE,07-July,FALSE,phish,1
